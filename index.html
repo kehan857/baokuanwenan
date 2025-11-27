@@ -90,6 +90,52 @@
             visibility: visible !important;
             opacity: 1 !important;
         }
+        
+        /* 隐藏"66"等数字文本 */
+        [class*="coze"] *:not([contenteditable]):not(input):not(textarea),
+        [id*="coze"] *:not([contenteditable]):not(input):not(textarea) {
+            /* 检查文本内容，如果是纯数字且很短，隐藏 */
+        }
+        
+        /* 隐藏文件选择相关元素 */
+        [class*="coze"] button:contains("选择文件"),
+        [class*="coze"] *[title*="选择文件"],
+        [class*="coze"] *[aria-label*="选择文件"],
+        [id*="coze"] button:contains("选择文件"),
+        [id*="coze"] *[title*="选择文件"],
+        [id*="coze"] *[aria-label*="选择文件"] {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* 隐藏"未选择任何文件"文本 */
+        [class*="coze"] *:contains("未选择任何文件"),
+        [id*="coze"] *:contains("未选择任何文件") {
+            display: none !important;
+            visibility: hidden !important;
+        }
+        
+        /* 隐藏文件输入框 */
+        [class*="coze"] input[type="file"],
+        [id*="coze"] input[type="file"] {
+            display: none !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            left: -9999px !important;
+            opacity: 0 !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        
+        /* 确保输入框布局正确 - 只显示输入框和发送按钮 */
+        [class*="coze"] [class*="input"],
+        [class*="coze"] [class*="Input"],
+        [id*="coze"] [class*="input"],
+        [id*="coze"] [class*="Input"] {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 8px !important;
+        }
     </style>
 </head>
 <body>
@@ -290,16 +336,76 @@
                         opened = forceOpenChat();
                     }
                     
-                    // 修复输入框显示：确保输入框正常显示
+                    // 修复输入框显示：确保输入框正常显示，隐藏不需要的元素
                     try {
-                        // 确保输入框容器可见
+                        // 隐藏"66"等数字文本
+                        var allElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
+                        allElements.forEach(function(el) {
+                            if (el && el.children.length === 0) { // 只处理叶子节点
+                                var text = (el.textContent || el.innerText || '').trim();
+                                // 如果是纯数字（如"66"）且不是输入框，隐藏它
+                                if (/^\d+$/.test(text) && text.length <= 3 && 
+                                    !el.hasAttribute('contenteditable') && 
+                                    el.tagName !== 'INPUT' && 
+                                    el.tagName !== 'TEXTAREA') {
+                                    el.style.display = 'none';
+                                    el.style.visibility = 'hidden';
+                                    el.style.width = '0';
+                                    el.style.height = '0';
+                                    el.style.opacity = '0';
+                                }
+                            }
+                        });
+                        
+                        // 隐藏"选择文件"按钮和文本
+                        var fileButtons = document.querySelectorAll('[class*="coze"] button, [id*="coze"] button');
+                        fileButtons.forEach(function(btn) {
+                            var text = (btn.textContent || btn.innerText || '').trim();
+                            var title = btn.getAttribute('title') || '';
+                            var ariaLabel = btn.getAttribute('aria-label') || '';
+                            if (text.indexOf('选择文件') >= 0 || 
+                                title.indexOf('选择文件') >= 0 || 
+                                ariaLabel.indexOf('选择文件') >= 0) {
+                                btn.style.display = 'none';
+                                btn.style.visibility = 'hidden';
+                            }
+                        });
+                        
+                        // 隐藏"未选择任何文件"文本
+                        var allTextElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
+                        allTextElements.forEach(function(el) {
+                            if (el && el.children.length === 0) {
+                                var text = (el.textContent || el.innerText || '').trim();
+                                if (text.indexOf('未选择任何文件') >= 0) {
+                                    el.style.display = 'none';
+                                    el.style.visibility = 'hidden';
+                                }
+                            }
+                        });
+                        
+                        // 隐藏文件输入框
+                        var fileInputs = document.querySelectorAll('[class*="coze"] input[type="file"], [id*="coze"] input[type="file"]');
+                        fileInputs.forEach(function(input) {
+                            input.style.display = 'none';
+                            input.style.visibility = 'hidden';
+                            input.style.position = 'absolute';
+                            input.style.left = '-9999px';
+                            input.style.opacity = '0';
+                            input.style.width = '0';
+                            input.style.height = '0';
+                        });
+                        
+                        // 确保输入框容器可见且布局正确
                         var inputContainers = document.querySelectorAll('[class*="coze"] [class*="input"], [class*="coze"] [class*="Input"], [id*="coze"] [class*="input"], [id*="coze"] [class*="Input"]');
                         inputContainers.forEach(function(container) {
                             if (container) {
                                 container.style.display = 'flex';
+                                container.style.flexDirection = 'row';
+                                container.style.alignItems = 'center';
                                 container.style.visibility = 'visible';
                                 container.style.opacity = '1';
                                 container.style.minHeight = '44px';
+                                container.style.gap = '8px';
                                 
                                 // 确保输入框本身可见
                                 var inputs = container.querySelectorAll('[contenteditable], [contenteditable="true"], textarea, input[type="text"]');
@@ -312,12 +418,30 @@
                                     input.style.flex = '1';
                                 });
                                 
-                                // 确保按钮可见
+                                // 只显示发送按钮，隐藏其他按钮（如文件上传按钮）
                                 var buttons = container.querySelectorAll('button');
                                 buttons.forEach(function(btn) {
-                                    btn.style.display = 'flex';
-                                    btn.style.visibility = 'visible';
-                                    btn.style.opacity = '1';
+                                    var text = (btn.textContent || btn.innerText || '').trim();
+                                    var title = btn.getAttribute('title') || '';
+                                    var ariaLabel = btn.getAttribute('aria-label') || '';
+                                    var innerHTML = btn.innerHTML || '';
+                                    
+                                    // 如果是发送按钮（包含发送图标或文字），显示
+                                    if (text.indexOf('发送') >= 0 || 
+                                        title.indexOf('发送') >= 0 || 
+                                        ariaLabel.indexOf('发送') >= 0 ||
+                                        innerHTML.indexOf('send') >= 0 ||
+                                        innerHTML.indexOf('Send') >= 0 ||
+                                        innerHTML.indexOf('paper') >= 0 ||
+                                        innerHTML.indexOf('arrow') >= 0) {
+                                        btn.style.display = 'flex';
+                                        btn.style.visibility = 'visible';
+                                        btn.style.opacity = '1';
+                                    } else {
+                                        // 其他按钮（如文件上传）隐藏
+                                        btn.style.display = 'none';
+                                        btn.style.visibility = 'hidden';
+                                    }
                                 });
                             }
                         });
