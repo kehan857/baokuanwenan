@@ -116,6 +116,65 @@
 
 3. **网络要求**: 需要能够访问 Coze CDN (`lf-cdn.coze.cn`)。
 
+## 故障排除
+
+### 403 Forbidden 错误
+
+如果遇到 403 错误，可能的原因和解决方案：
+
+#### 1. SAT 令牌权限问题
+
+**检查步骤：**
+- 登录 Coze 开放平台
+- 进入"服务访问令牌"管理页面
+- 确认 SAT 令牌：
+  - 是否仍然有效（未过期）
+  - 是否有访问目标 App 的权限
+  - 是否与 App ID `7576948828981608511` 正确关联
+
+**解决方案：**
+- 如果令牌无效或权限不足，请在 Coze 平台重新生成 SAT 令牌
+- 确保新令牌有完整的 API 访问权限
+- 更新 `index.html` 中的令牌
+
+#### 2. CORS 配置
+
+根据 Coze API 的 CORS 策略：
+- `Access-Control-Allow-Origin: *`（允许所有域名）
+- `Access-Control-Allow-Credentials: false`（禁止凭据）
+
+**注意事项：**
+- 确保请求不携带不必要的凭据（如 Cookies）
+- 令牌应通过 `Authorization: Bearer <token>` 头传递
+- 当前配置已符合要求，无需额外调整
+
+#### 3. App 和 Workflow 配置
+
+**检查步骤：**
+- 确认 App ID `7576948828981608511` 是否正确
+- 确认 Workflow ID `7577062163073941540` 是否正确
+- 确认 App 已发布且可访问
+- 确认 App 允许通过 SAT 令牌访问
+
+#### 4. 查看详细错误信息
+
+如果问题仍然存在：
+- 打开浏览器开发者工具（F12）
+- 查看 Network 标签中的请求详情
+- 检查响应头中的 `x-tt-logid`，可用于联系 Coze 技术支持查询具体错误原因
+
+### 其他常见问题
+
+#### 页面无法加载
+- 检查 GitHub Pages 是否已正确部署
+- 清除浏览器缓存或使用无痕模式
+- 确认访问的 URL 正确：`https://kehan857.github.io/baokuanwenan/`
+
+#### SDK 加载失败
+- 检查网络连接，确保能访问 `lf-cdn.coze.cn`
+- 检查浏览器控制台是否有错误信息
+- 尝试刷新页面
+
 ## 参考文档
 
 - [Coze Web SDK 安装指南](https://www.coze.cn/open/docs/developer_guides/install_web_sdk)
