@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>爆款文案生成 - AI智能助手</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">爆款文案生成</h1>
+            <p class="subtitle">AI智能助手，助您创作优质文案</p>
+        </header>
+        
+        <main class="main-content">
+            <div id="coze-chat-container" class="chat-container"></div>
+        </main>
+        
+        <footer class="footer">
+            <p>Powered by Coze AI</p>
+        </footer>
+    </div>
+
+    <script type="text/javascript">
+        var webSdkScript = document.createElement('script');
+        webSdkScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
+        document.head.appendChild(webSdkScript);
+
+        webSdkScript.onload = function () {
+            // 服务访问令牌（SAT）
+            const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
+            
+            new CozeWebSDK.WebChatClient({
+                "config": {
+                    "type": "app",
+                    "appInfo": {
+                        "appId": "7576948828981608511",
+                        "workflowId": "7577062163073941540"
+                    }
+                },
+                "auth": {
+                    "type": "token",
+                    "token": serviceToken,
+                    onRefreshToken: function () {
+                        // 返回相同的服务访问令牌
+                        return serviceToken;
+                    }
+                },
+                // 可选：自定义容器
+                "container": document.getElementById('coze-chat-container')
+            });
+        };
+
+        // 错误处理
+        webSdkScript.onerror = function () {
+            console.error('Failed to load Coze Web SDK');
+            document.getElementById('coze-chat-container').innerHTML = 
+                '<div class="error-message">加载失败，请刷新页面重试</div>';
+        };
+    </script>
+</body>
+</html>
+
