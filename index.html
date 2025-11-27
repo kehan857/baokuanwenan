@@ -291,6 +291,36 @@
             // 服务访问令牌（SAT）
             const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
             
+            // 生成设备唯一的用户ID（每个设备固定，不同设备不同）
+            function generateDeviceUserId() {
+                // 尝试从localStorage获取已存在的设备ID
+                let deviceId = localStorage.getItem('coze_device_user_id');
+                
+                if (!deviceId) {
+                    // 生成基于设备特征的唯一ID
+                    const userAgent = navigator.userAgent || '';
+                    const language = navigator.language || '';
+                    const platform = navigator.platform || '';
+                    const screenSize = (screen.width || 0) + 'x' + (screen.height || 0);
+                    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+                    
+                    // 组合设备特征生成唯一ID
+                    const deviceFingerprint = userAgent.substring(0, 50) + language + platform + screenSize + timezone;
+                    const hash = deviceFingerprint.split('').reduce(function(a, b) {
+                        a = ((a << 5) - a) + b.charCodeAt(0);
+                        return a & a;
+                    }, 0);
+                    
+                    // 生成设备ID
+                    deviceId = 'device_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
+                    
+                    // 保存到localStorage，确保同一设备始终使用相同的ID
+                    localStorage.setItem('coze_device_user_id', deviceId);
+                }
+                
+                return deviceId;
+            }
+            
             // 生成新的会话ID，每次刷新页面时都会生成新的
             // 使用URL参数 + 时间戳 + 随机数，确保每次都是新会话
             function generateSessionId() {
@@ -375,6 +405,10 @@
             }
             
             try {
+                // 生成设备唯一的用户ID（每个设备固定）
+                const deviceUserId = generateDeviceUserId();
+                console.log('设备用户ID:', deviceUserId);
+                
                 // 生成新的会话ID（在初始化之前）
                 const newSessionId = generateSessionId();
                 console.log('新会话ID:', newSessionId);
@@ -399,6 +433,11 @@
                             // 返回相同的服务访问令牌
                             return serviceToken;
                         }
+                    },
+                    // 用户信息：根据设备生成唯一ID，不同设备看到不同的对话记录
+                    "userInfo": {
+                        "id": deviceUserId,
+                        "nickname": "用户"
                     },
                     // 不指定container，使用SDK默认的渲染方式，避免输入框显示问题
                     // 组件属性：自动展开聊天窗口（关键配置）
