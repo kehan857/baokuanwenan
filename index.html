@@ -132,13 +132,18 @@
                     return false;
                 }
                 
-                // 立即尝试打开
+                // 立即尝试打开（更频繁的尝试）
+                setTimeout(forceOpenChat, 50);
                 setTimeout(forceOpenChat, 100);
+                setTimeout(forceOpenChat, 200);
                 setTimeout(forceOpenChat, 300);
                 setTimeout(forceOpenChat, 500);
+                setTimeout(forceOpenChat, 800);
                 setTimeout(forceOpenChat, 1000);
+                setTimeout(forceOpenChat, 1500);
                 setTimeout(forceOpenChat, 2000);
                 setTimeout(forceOpenChat, 3000);
+                setTimeout(forceOpenChat, 5000);
                 
                 // 监听 ready 事件
                 if (chatClient && typeof chatClient.on === 'function') {
