@@ -33,53 +33,13 @@
             display: none !important;
         }
         
-        /* 修复输入框显示问题 - 使用更精确的选择器 */
-        [class*="coze"] input,
-        [class*="coze"] textarea,
-        [class*="coze"] [contenteditable],
-        [id*="coze"] input,
-        [id*="coze"] textarea,
-        [id*="coze"] [contenteditable] {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
-            font-size: 14px !important;
-            line-height: 1.5 !important;
-            color: #333 !important;
-            background: transparent !important;
-            border: none !important;
-            outline: none !important;
-            padding: 8px 12px !important;
-            margin: 0 !important;
-            flex: 1 !important;
-            box-sizing: border-box !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            white-space: normal !important;
-            word-wrap: break-word !important;
-            overflow-wrap: break-word !important;
-            min-width: 0 !important;
-            /* 确保输入框可编辑 */
+        /* 最小化CSS干预，让SDK使用默认样式 */
+        /* 只确保输入框可见和可编辑，不覆盖SDK的默认样式 */
+        [class*="coze"] [contenteditable="true"],
+        [id*="coze"] [contenteditable="true"] {
             pointer-events: auto !important;
             user-select: text !important;
             -webkit-user-select: text !important;
-        }
-        
-        /* 确保contenteditable元素可编辑 */
-        [class*="coze"] [contenteditable="true"],
-        [id*="coze"] [contenteditable="true"],
-        [class*="coze"] [contenteditable=""],
-        [id*="coze"] [contenteditable=""] {
-            contenteditable: true !important;
-            -webkit-user-modify: read-write !important;
-            user-modify: read-write !important;
-        }
-        
-        /* 确保输入框未被禁用 */
-        [class*="coze"] input:not([disabled]),
-        [class*="coze"] textarea:not([disabled]),
-        [id*="coze"] input:not([disabled]),
-        [id*="coze"] textarea:not([disabled]) {
-            pointer-events: auto !important;
         }
         
         /* 修复输入框容器布局 - 确保横向排列 */
@@ -439,19 +399,10 @@
                         "id": deviceUserId,
                         "nickname": "用户"
                     },
-                    // 不指定container，使用SDK默认的渲染方式，避免输入框显示问题
+                    // 使用SDK默认的渲染方式，最小化自定义配置
                     // 组件属性：自动展开聊天窗口（关键配置）
                     "componentProps": {
-                        "defaultOpen": true,
-                        // 启用文件上传功能
-                        "enableUpload": true,
-                        "enableFileUpload": true,
-                        // 启用清除历史记录功能
-                        "enableClearHistory": true,
-                        "showClearButton": true,
-                        // 显示工具栏按钮
-                        "showToolbar": true,
-                        "showActions": true
+                        "defaultOpen": true
                     },
                     // UI配置
                     "ui": {
