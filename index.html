@@ -13,6 +13,25 @@
             height: 100vh;
             overflow: hidden;
         }
+        
+        /* 强制显示 Coze 聊天窗口 */
+        [class*="coze"] [class*="chat"],
+        [class*="coze"] [class*="window"],
+        [class*="coze"] [class*="panel"],
+        [id*="coze"] [class*="chat"],
+        [id*="coze"] [class*="window"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            z-index: 9999 !important;
+        }
+        
+        /* 隐藏悬浮按钮 */
+        [class*="coze"] [class*="button"][style*="position: fixed"],
+        [class*="asst"][style*="position: fixed"],
+        [id*="coze"][style*="position: fixed"] {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
