@@ -15,24 +15,29 @@
             // 服务访问令牌（SAT）
             const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
             
-            new CozeWebSDK.WebChatClient({
-                "config": {
-                    "type": "app",
-                    "appInfo": {
-                        "appId": "7576948828981608511",
-                        "workflowId": "7577062163073941540"
+            try {
+                new CozeWebSDK.WebChatClient({
+                    "config": {
+                        "type": "app",
+                        "appInfo": {
+                            "appId": "7576948828981608511",
+                            "workflowId": "7577062163073941540"
+                        }
+                    },
+                    "auth": {
+                        "type": "token",
+                        "token": serviceToken,
+                        onRefreshToken: function () {
+                            // 返回相同的服务访问令牌
+                            return serviceToken;
+                        }
                     }
-                },
-                "auth": {
-                    "type": "token",
-                    "token": serviceToken,
-                    onRefreshToken: function () {
-                        // 返回相同的服务访问令牌
-                        return serviceToken;
-                    }
-                }
-                // 不指定 container，使用 Coze SDK 默认界面
-            });
+                    // 不指定 container，使用 Coze SDK 默认界面
+                });
+            } catch (error) {
+                console.error('Coze SDK 初始化错误:', error);
+                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置</div>';
+            }
         };
 
         // 错误处理
