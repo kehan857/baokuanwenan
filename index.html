@@ -35,6 +35,9 @@
     </style>
 </head>
 <body>
+    <!-- 创建容器用于嵌入聊天窗口 -->
+    <div id="coze-chat-container" style="width: 100%; height: 100vh; position: fixed; top: 0; left: 0; z-index: 9999;"></div>
+    
     <script type="text/javascript">
         var webSdkScript = document.createElement('script');
         webSdkScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
@@ -68,6 +71,8 @@
                             return serviceToken;
                         }
                     },
+                    // 指定容器，直接嵌入到页面中
+                    "container": document.getElementById('coze-chat-container'),
                     // 组件属性：自动展开聊天窗口（关键配置）
                     "componentProps": {
                         "defaultOpen": true
