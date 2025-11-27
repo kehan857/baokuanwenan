@@ -93,6 +93,39 @@
             height: 0 !important;
             overflow: hidden !important;
         }
+        
+        /* 隐藏文件选择按钮 */
+        [class*="coze"] [class*="file"],
+        [class*="coze"] [class*="File"],
+        [class*="coze"] [class*="upload"],
+        [class*="coze"] [class*="Upload"],
+        [id*="coze"] [class*="file"],
+        [id*="coze"] [class*="File"],
+        [id*="coze"] [class*="upload"],
+        [id*="coze"] [class*="Upload"],
+        [class*="coze"] button[class*="file"],
+        [class*="coze"] button[class*="File"],
+        [class*="coze"] [class*="选择文件"],
+        [id*="coze"] [class*="选择文件"],
+        [class*="coze"] [title*="选择"],
+        [id*="coze"] [title*="选择"] {
+            display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            width: 0 !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+        }
+        
+        /* 隐藏文件输入框 */
+        [class*="coze"] input[type="file"],
+        [id*="coze"] input[type="file"] {
+            display: none !important;
+            visibility: hidden !important;
+            position: absolute !important;
+            left: -9999px !important;
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body>
@@ -108,27 +141,23 @@
             // 生成新的会话ID，每次刷新页面时都会生成新的
             // 使用URL参数 + 时间戳 + 随机数，确保每次都是新会话
             function generateSessionId() {
-                // 从URL获取随机参数（如果有）
-                const urlParams = new URLSearchParams(window.location.search);
-                let urlRandom = urlParams.get('r');
-                
-                // 如果没有URL参数，生成一个并更新URL（不刷新页面）
-                if (!urlRandom) {
-                    urlRandom = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                    const newUrl = window.location.pathname + '?r=' + urlRandom + (window.location.hash || '');
-                    window.history.replaceState({}, '', newUrl);
-                }
+                // 强制生成新的随机参数，每次刷新都不同
+                const urlRandom = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
+                const newUrl = window.location.pathname + '?r=' + urlRandom + (window.location.hash || '');
+                window.history.replaceState({}, '', newUrl);
                 
                 // 组合时间戳、随机数和URL参数，确保唯一性
                 const timestamp = Date.now();
                 const random = Math.random().toString(36).substring(2, 15);
                 const random2 = Math.random().toString(36).substring(2, 15);
-                return 'session_' + timestamp + '_' + random + '_' + random2 + '_' + urlRandom;
+                const random3 = Math.random().toString(36).substring(2, 15);
+                return 'session_' + timestamp + '_' + random + '_' + random2 + '_' + random3 + '_' + urlRandom;
             }
             
             // 清除所有可能存在的会话缓存（更彻底）
+            // 在SDK初始化之前就清除，确保不会复用旧会话
             try {
-                // 清除localStorage中所有相关数据
+                // 清除localStorage中所有相关数据（包括所有可能的变体）
                 const allKeys = Object.keys(localStorage);
                 allKeys.forEach(key => {
                     if (key && (
@@ -136,7 +165,9 @@
                         key.toLowerCase().indexOf('session') >= 0 || 
                         key.toLowerCase().indexOf('chat') >= 0 ||
                         key.toLowerCase().indexOf('app') >= 0 ||
-                        key.toLowerCase().indexOf('workflow') >= 0
+                        key.toLowerCase().indexOf('workflow') >= 0 ||
+                        key.toLowerCase().indexOf('7576948828981608511') >= 0 || // App ID
+                        key.toLowerCase().indexOf('7577062163073941540') >= 0     // Workflow ID
                     )) {
                         localStorage.removeItem(key);
                     }
@@ -150,7 +181,9 @@
                         key.toLowerCase().indexOf('session') >= 0 || 
                         key.toLowerCase().indexOf('chat') >= 0 ||
                         key.toLowerCase().indexOf('app') >= 0 ||
-                        key.toLowerCase().indexOf('workflow') >= 0
+                        key.toLowerCase().indexOf('workflow') >= 0 ||
+                        key.toLowerCase().indexOf('7576948828981608511') >= 0 ||
+                        key.toLowerCase().indexOf('7577062163073941540') >= 0
                     )) {
                         sessionStorage.removeItem(key);
                     }
@@ -163,18 +196,36 @@
                             if (db.name && (
                                 db.name.toLowerCase().indexOf('coze') >= 0 ||
                                 db.name.toLowerCase().indexOf('session') >= 0 ||
-                                db.name.toLowerCase().indexOf('chat') >= 0
+                                db.name.toLowerCase().indexOf('chat') >= 0 ||
+                                db.name.toLowerCase().indexOf('7576948828981608511') >= 0 ||
+                                db.name.toLowerCase().indexOf('7577062163073941540') >= 0
                             )) {
                                 indexedDB.deleteDatabase(db.name);
                             }
                         });
                     }).catch(() => {});
                 }
+                
+                // 清除Cookie中可能存在的会话信息
+                document.cookie.split(";").forEach(function(c) { 
+                    const cookieName = c.split("=")[0].trim();
+                    if (cookieName && (
+                        cookieName.toLowerCase().indexOf('coze') >= 0 ||
+                        cookieName.toLowerCase().indexOf('session') >= 0 ||
+                        cookieName.toLowerCase().indexOf('chat') >= 0
+                    )) {
+                        document.cookie = cookieName + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
+                    }
+                });
             } catch (e) {
                 console.log('清除缓存时出错（可忽略）:', e);
             }
             
             try {
+                // 生成新的会话ID（在初始化之前）
+                const newSessionId = generateSessionId();
+                console.log('新会话ID:', newSessionId);
+                
                 const chatClient = new CozeWebSDK.WebChatClient({
                     "config": {
                         "type": "app",
@@ -184,7 +235,9 @@
                         },
                         // 每次刷新页面时生成新的会话ID
                         // 确保每次打开都是全新的会话
-                        "sessionId": generateSessionId()
+                        "sessionId": newSessionId,
+                        // 禁用历史记录
+                        "enableHistory": false
                     },
                     "auth": {
                         "type": "token",
