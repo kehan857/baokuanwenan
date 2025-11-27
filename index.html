@@ -126,6 +126,40 @@
             left: -9999px !important;
             opacity: 0 !important;
         }
+        
+        /* 隐藏数字标签（如"66"） */
+        [class*="coze"] [class*="input"] > span:first-child,
+        [class*="coze"] [class*="Input"] > span:first-child,
+        [id*="coze"] [class*="input"] > span:first-child,
+        [id*="coze"] [class*="Input"] > span:first-child,
+        [class*="coze"] [class*="input"] > div:first-child:not([contenteditable]),
+        [class*="coze"] [class*="Input"] > div:first-child:not([contenteditable]),
+        [id*="coze"] [class*="input"] > div:first-child:not([contenteditable]),
+        [id*="coze"] [class*="Input"] > div:first-child:not([contenteditable]) {
+            display: none !important;
+            visibility: hidden !important;
+            width: 0 !important;
+            height: 0 !important;
+            overflow: hidden !important;
+            opacity: 0 !important;
+        }
+        
+        /* 隐藏包含数字的文本节点（通用方法） */
+        [class*="coze"] [class*="input"] *:empty,
+        [class*="coze"] [class*="Input"] *:empty,
+        [id*="coze"] [class*="input"] *:empty,
+        [id*="coze"] [class*="Input"] *:empty {
+            display: none !important;
+        }
+        
+        /* 隐藏输入框左侧的数字或图标 */
+        [class*="coze"] [class*="input"]::before,
+        [class*="coze"] [class*="Input"]::before,
+        [id*="coze"] [class*="input"]::before,
+        [id*="coze"] [class*="Input"]::before {
+            display: none !important;
+            content: none !important;
+        }
     </style>
 </head>
 <body>
@@ -328,11 +362,36 @@
                     });
                 }
                 
-                // 监听 DOM 变化，持续尝试打开
+                // 监听 DOM 变化，持续尝试打开，并隐藏不需要的元素
                 var opened = false;
                 var observer = new MutationObserver(function(mutations) {
                     if (!opened) {
                         opened = forceOpenChat();
+                    }
+                    
+                    // 隐藏"66"等数字标签
+                    try {
+                        // 查找输入框区域的所有子元素
+                        var inputContainers = document.querySelectorAll('[class*="coze"] [class*="input"], [class*="coze"] [class*="Input"], [id*="coze"] [class*="input"], [id*="coze"] [class*="Input"]');
+                        inputContainers.forEach(function(container) {
+                            if (container && container.children.length > 0) {
+                                // 检查第一个子元素是否是数字或不需要的元素
+                                var firstChild = container.children[0];
+                                if (firstChild) {
+                                    var text = firstChild.textContent || firstChild.innerText || '';
+                                    // 如果是纯数字（如"66"）或者是空元素，隐藏它
+                                    if (/^\d+$/.test(text.trim()) || text.trim() === '' || firstChild.offsetWidth < 30) {
+                                        firstChild.style.display = 'none';
+                                        firstChild.style.visibility = 'hidden';
+                                        firstChild.style.width = '0';
+                                        firstChild.style.height = '0';
+                                        firstChild.style.opacity = '0';
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        // 忽略错误
                     }
                 });
                 
@@ -350,6 +409,26 @@
                         console.warn('15秒内未能自动打开聊天窗口，请手动点击');
                     }
                 }, 15000);
+                
+                // 延迟执行一次，确保隐藏"66"等元素
+                setTimeout(function() {
+                    try {
+                        var allElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
+                        allElements.forEach(function(el) {
+                            var text = el.textContent || el.innerText || '';
+                            // 如果元素只包含数字（如"66"）且不是输入框本身
+                            if (/^\s*\d+\s*$/.test(text) && el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA' && !el.isContentEditable) {
+                                el.style.display = 'none';
+                                el.style.visibility = 'hidden';
+                                el.style.width = '0';
+                                el.style.height = '0';
+                                el.style.opacity = '0';
+                            }
+                        });
+                    } catch (e) {
+                        // 忽略错误
+                    }
+                }, 2000);
                 
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
