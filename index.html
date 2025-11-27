@@ -4,24 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>爆款文案生成 - AI智能助手</title>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1 class="title">爆款文案生成</h1>
-            <p class="subtitle">AI智能助手，助您创作优质文案</p>
-        </header>
-        
-        <main class="main-content">
-            <div id="coze-chat-container" class="chat-container"></div>
-        </main>
-        
-        <footer class="footer">
-            <p>Powered by Coze AI</p>
-        </footer>
-    </div>
-
     <script type="text/javascript">
         var webSdkScript = document.createElement('script');
         webSdkScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
@@ -46,17 +30,15 @@
                         // 返回相同的服务访问令牌
                         return serviceToken;
                     }
-                },
-                // 可选：自定义容器
-                "container": document.getElementById('coze-chat-container')
+                }
+                // 不指定 container，使用 Coze SDK 默认界面
             });
         };
 
         // 错误处理
         webSdkScript.onerror = function () {
             console.error('Failed to load Coze Web SDK');
-            document.getElementById('coze-chat-container').innerHTML = 
-                '<div class="error-message">加载失败，请刷新页面重试</div>';
+            document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">加载失败，请刷新页面重试</div>';
         };
     </script>
 </body>
