@@ -16,7 +16,7 @@
             const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
             
             try {
-                new CozeWebSDK.WebChatClient({
+                const chatClient = new CozeWebSDK.WebChatClient({
                     "config": {
                         "type": "app",
                         "appInfo": {
@@ -31,9 +31,21 @@
                             // 返回相同的服务访问令牌
                             return serviceToken;
                         }
+                    },
+                    "ui": {
+                        // 设置为嵌入模式，直接显示聊天窗口
+                        "mode": "embed",
+                        // 隐藏悬浮按钮
+                        "asstBtn": false
                     }
-                    // 不指定 container，使用 Coze SDK 默认界面
                 });
+                
+                // 页面加载时自动打开聊天窗口
+                setTimeout(function() {
+                    if (chatClient && typeof chatClient.open === 'function') {
+                        chatClient.open();
+                    }
+                }, 500);
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
                 document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置</div>';
