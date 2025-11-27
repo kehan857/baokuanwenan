@@ -612,6 +612,64 @@
                                     input.style.minWidth = '0';
                                     input.style.width = 'auto';
                                 }
+                                
+                                // 如果按钮不存在，尝试创建它们
+                                // 检查是否已有清除按钮
+                                var hasClearBtn = container.querySelector('button[class*="clear"], button[class*="reset"], button[aria-label*="清除"], button[title*="清除"], button[aria-label*="Clear"], button[title*="Clear"]');
+                                if (!hasClearBtn && container.parentElement) {
+                                    var clearBtn = document.createElement('button');
+                                    clearBtn.innerHTML = '🗑';
+                                    clearBtn.setAttribute('aria-label', '清除历史记录');
+                                    clearBtn.setAttribute('title', '清除历史记录');
+                                    clearBtn.className = 'coze-clear-btn';
+                                    clearBtn.style.cssText = 'display: flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; margin-right: 8px; flex-shrink: 0;';
+                                    clearBtn.onclick = function() {
+                                        if (window.cozeChatClient) {
+                                            if (typeof window.cozeChatClient.clear === 'function') {
+                                                window.cozeChatClient.clear();
+                                            } else if (typeof window.cozeChatClient.reset === 'function') {
+                                                window.cozeChatClient.reset();
+                                            } else if (typeof window.cozeChatClient.newChat === 'function') {
+                                                window.cozeChatClient.newChat();
+                                            }
+                                        }
+                                    };
+                                    container.insertBefore(clearBtn, container.firstChild);
+                                }
+                                
+                                // 检查是否已有上传按钮
+                                var hasUploadBtn = container.querySelector('button[class*="add"], button[class*="attach"], button[aria-label*="添加"], button[title*="添加"], button[aria-label*="Upload"], button[title*="Upload"]');
+                                if (!hasUploadBtn) {
+                                    var uploadBtn = document.createElement('button');
+                                    uploadBtn.innerHTML = '+';
+                                    uploadBtn.setAttribute('aria-label', '上传文件');
+                                    uploadBtn.setAttribute('title', '上传文件');
+                                    uploadBtn.className = 'coze-upload-btn';
+                                    uploadBtn.style.cssText = 'display: flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; margin-left: 8px; flex-shrink: 0; font-size: 20px;';
+                                    uploadBtn.onclick = function() {
+                                        var fileInput = document.createElement('input');
+                                        fileInput.type = 'file';
+                                        fileInput.style.display = 'none';
+                                        fileInput.onchange = function(e) {
+                                            var file = e.target.files[0];
+                                            if (file && window.cozeChatClient) {
+                                                if (typeof window.cozeChatClient.uploadFile === 'function') {
+                                                    window.cozeChatClient.uploadFile(file);
+                                                } else if (typeof window.cozeChatClient.sendFile === 'function') {
+                                                    window.cozeChatClient.sendFile(file);
+                                                }
+                                            }
+                                        };
+                                        document.body.appendChild(fileInput);
+                                        fileInput.click();
+                                        setTimeout(function() { 
+                                            if (fileInput.parentElement) {
+                                                document.body.removeChild(fileInput);
+                                            }
+                                        }, 100);
+                                    };
+                                    container.appendChild(uploadBtn);
+                                }
                             }
                         });
                     } catch (e) {
