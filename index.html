@@ -33,59 +33,69 @@
             display: none !important;
         }
         
-        /* 修复输入框显示问题 */
-        [class*="coze"] input[type="text"],
-        [class*="coze"] input[type="textarea"],
+        /* 修复输入框显示问题 - 使用更精确的选择器 */
+        [class*="coze"] input,
         [class*="coze"] textarea,
-        [class*="coze"] [contenteditable="true"],
-        [id*="coze"] input[type="text"],
-        [id*="coze"] input[type="textarea"],
+        [class*="coze"] [contenteditable],
+        [id*="coze"] input,
         [id*="coze"] textarea,
-        [id*="coze"] [contenteditable="true"] {
+        [id*="coze"] [contenteditable] {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
             font-size: 14px !important;
+            line-height: 1.5 !important;
             color: #333 !important;
             background: transparent !important;
             border: none !important;
             outline: none !important;
-            padding: 0 !important;
+            padding: 8px 12px !important;
             margin: 0 !important;
             width: 100% !important;
             box-sizing: border-box !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            white-space: normal !important;
+            word-wrap: break-word !important;
+            overflow-wrap: break-word !important;
         }
         
-        /* 隐藏输入框中的调试文本或占位符问题 */
-        [class*="coze"] [class*="input"]::before,
-        [class*="coze"] [class*="input"]::after,
-        [id*="coze"] [class*="input"]::before,
-        [id*="coze"] [class*="input"]::after {
-            display: none !important;
-            content: none !important;
-        }
-        
-        /* 确保输入区域正常显示 */
-        [class*="coze"] [class*="input-container"],
-        [class*="coze"] [class*="input-wrapper"],
-        [id*="coze"] [class*="input-container"],
-        [id*="coze"] [class*="input-wrapper"] {
+        /* 修复输入框容器布局 */
+        [class*="coze"] [class*="input"],
+        [class*="coze"] [class*="Input"],
+        [id*="coze"] [class*="input"],
+        [id*="coze"] [class*="Input"] {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
             position: relative !important;
             width: 100% !important;
             box-sizing: border-box !important;
         }
         
-        /* 隐藏SDK调试信息 */
+        /* 确保输入框内的文本正常显示，不换行 */
+        [class*="coze"] [class*="input"] > *,
+        [class*="coze"] [class*="Input"] > *,
+        [id*="coze"] [class*="input"] > *,
+        [id*="coze"] [class*="Input"] > * {
+            display: inline-block !important;
+            white-space: nowrap !important;
+        }
+        
+        /* 隐藏SDK调试信息和banner */
         [class*="web_sdk"],
         [id*="web_sdk"],
         [class*="banner"],
-        [id*="banner"] {
+        [id*="banner"],
+        [class*="web_sdk_official_banner"],
+        [id*="web_sdk_official_banner"] {
             display: none !important;
+            visibility: hidden !important;
+            height: 0 !important;
+            overflow: hidden !important;
         }
     </style>
 </head>
 <body>
-    <!-- 创建容器用于嵌入聊天窗口 -->
-    <div id="coze-chat-container" style="width: 100%; height: 100vh; position: fixed; top: 0; left: 0; z-index: 9999;"></div>
-    
     <script type="text/javascript">
         var webSdkScript = document.createElement('script');
         webSdkScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
@@ -96,37 +106,70 @@
             const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
             
             // 生成新的会话ID，每次刷新页面时都会生成新的
-            // 使用更强大的唯一ID生成方式，确保每次都是新会话
+            // 使用URL参数 + 时间戳 + 随机数，确保每次都是新会话
             function generateSessionId() {
-                // 组合时间戳、随机数和用户代理信息，确保唯一性
+                // 从URL获取随机参数（如果有）
+                const urlParams = new URLSearchParams(window.location.search);
+                let urlRandom = urlParams.get('r');
+                
+                // 如果没有URL参数，生成一个并更新URL（不刷新页面）
+                if (!urlRandom) {
+                    urlRandom = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                    const newUrl = window.location.pathname + '?r=' + urlRandom + (window.location.hash || '');
+                    window.history.replaceState({}, '', newUrl);
+                }
+                
+                // 组合时间戳、随机数和URL参数，确保唯一性
                 const timestamp = Date.now();
                 const random = Math.random().toString(36).substring(2, 15);
                 const random2 = Math.random().toString(36).substring(2, 15);
-                const userAgent = navigator.userAgent ? navigator.userAgent.substring(0, 10) : '';
-                return 'session_' + timestamp + '_' + random + '_' + random2 + '_' + userAgent;
+                return 'session_' + timestamp + '_' + random + '_' + random2 + '_' + urlRandom;
             }
             
-            // 清除可能存在的会话缓存
+            // 清除所有可能存在的会话缓存（更彻底）
             try {
-                // 清除localStorage中可能存在的会话数据
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key && (key.indexOf('coze') >= 0 || key.indexOf('session') >= 0 || key.indexOf('chat') >= 0)) {
-                        keysToRemove.push(key);
+                // 清除localStorage中所有相关数据
+                const allKeys = Object.keys(localStorage);
+                allKeys.forEach(key => {
+                    if (key && (
+                        key.toLowerCase().indexOf('coze') >= 0 || 
+                        key.toLowerCase().indexOf('session') >= 0 || 
+                        key.toLowerCase().indexOf('chat') >= 0 ||
+                        key.toLowerCase().indexOf('app') >= 0 ||
+                        key.toLowerCase().indexOf('workflow') >= 0
+                    )) {
+                        localStorage.removeItem(key);
                     }
-                }
-                keysToRemove.forEach(key => localStorage.removeItem(key));
+                });
                 
-                // 清除sessionStorage中可能存在的会话数据
-                const sessionKeysToRemove = [];
-                for (let i = 0; i < sessionStorage.length; i++) {
-                    const key = sessionStorage.key(i);
-                    if (key && (key.indexOf('coze') >= 0 || key.indexOf('session') >= 0 || key.indexOf('chat') >= 0)) {
-                        sessionKeysToRemove.push(key);
+                // 清除sessionStorage中所有相关数据
+                const allSessionKeys = Object.keys(sessionStorage);
+                allSessionKeys.forEach(key => {
+                    if (key && (
+                        key.toLowerCase().indexOf('coze') >= 0 || 
+                        key.toLowerCase().indexOf('session') >= 0 || 
+                        key.toLowerCase().indexOf('chat') >= 0 ||
+                        key.toLowerCase().indexOf('app') >= 0 ||
+                        key.toLowerCase().indexOf('workflow') >= 0
+                    )) {
+                        sessionStorage.removeItem(key);
                     }
+                });
+                
+                // 清除IndexedDB（如果存在）
+                if ('indexedDB' in window) {
+                    indexedDB.databases().then(databases => {
+                        databases.forEach(db => {
+                            if (db.name && (
+                                db.name.toLowerCase().indexOf('coze') >= 0 ||
+                                db.name.toLowerCase().indexOf('session') >= 0 ||
+                                db.name.toLowerCase().indexOf('chat') >= 0
+                            )) {
+                                indexedDB.deleteDatabase(db.name);
+                            }
+                        });
+                    }).catch(() => {});
                 }
-                sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
             } catch (e) {
                 console.log('清除缓存时出错（可忽略）:', e);
             }
@@ -141,9 +184,7 @@
                         },
                         // 每次刷新页面时生成新的会话ID
                         // 确保每次打开都是全新的会话
-                        "sessionId": generateSessionId(),
-                        // 禁用会话持久化，确保每次都是新会话
-                        "persistSession": false
+                        "sessionId": generateSessionId()
                     },
                     "auth": {
                         "type": "token",
@@ -153,8 +194,7 @@
                             return serviceToken;
                         }
                     },
-                    // 指定容器，直接嵌入到页面中
-                    "container": document.getElementById('coze-chat-container'),
+                    // 不指定container，使用SDK默认的渲染方式，避免输入框显示问题
                     // 组件属性：自动展开聊天窗口（关键配置）
                     "componentProps": {
                         "defaultOpen": true
