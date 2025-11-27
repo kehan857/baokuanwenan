@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>爆款文案生成 - AI智能助手</title>
+    <style>
+        /* 确保页面全屏显示聊天界面 */
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
     <script type="text/javascript">
@@ -35,25 +45,59 @@
                 });
                 
                 // 页面加载时自动打开聊天窗口
-                // 等待 SDK 完全初始化后自动展开
-                setTimeout(function() {
+                // 使用多种方式确保能够自动展开
+                function autoOpenChat() {
                     try {
-                        // 尝试多种方式打开聊天窗口
+                        // 方法1: 尝试调用 open 方法
                         if (chatClient && typeof chatClient.open === 'function') {
                             chatClient.open();
-                        } else if (chatClient && typeof chatClient.show === 'function') {
+                            return;
+                        }
+                        
+                        // 方法2: 尝试调用 show 方法
+                        if (chatClient && typeof chatClient.show === 'function') {
                             chatClient.show();
-                        } else {
-                            // 如果 SDK 没有提供 open 方法，尝试点击悬浮按钮
-                            var chatButton = document.querySelector('[class*="coze"] [class*="button"], [class*="chat"] [class*="button"], .coze-chat-button, .coze-asst-btn');
-                            if (chatButton) {
-                                chatButton.click();
+                            return;
+                        }
+                        
+                        // 方法3: 查找并点击悬浮按钮
+                        var selectors = [
+                            '[class*="coze"] [class*="button"]',
+                            '[class*="chat"] [class*="button"]',
+                            '.coze-chat-button',
+                            '.coze-asst-btn',
+                            '[class*="asst"]',
+                            'button[class*="coze"]',
+                            'div[class*="coze"][role="button"]'
+                        ];
+                        
+                        for (var i = 0; i < selectors.length; i++) {
+                            var button = document.querySelector(selectors[i]);
+                            if (button) {
+                                button.click();
+                                return;
                             }
                         }
                     } catch (e) {
-                        console.log('自动打开聊天窗口:', e);
+                        console.log('自动打开聊天窗口尝试:', e);
                     }
-                }, 1000);
+                }
+                
+                // 多次尝试，确保能够打开
+                setTimeout(autoOpenChat, 500);
+                setTimeout(autoOpenChat, 1000);
+                setTimeout(autoOpenChat, 2000);
+                
+                // 监听 DOM 变化，当聊天按钮出现时自动点击
+                var observer = new MutationObserver(function(mutations) {
+                    autoOpenChat();
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+                
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
                 document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置</div>';
