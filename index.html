@@ -14,22 +14,37 @@
             overflow: hidden;
         }
         
-        /* 强制显示 Coze 聊天窗口 */
+        /* 强制显示 Coze 聊天窗口 - 使用更宽泛的选择器 */
+        [class*="coze"],
+        [id*="coze"],
+        [class*="Coze"],
+        [id*="Coze"] {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* 确保聊天窗口容器显示 */
         [class*="coze"] [class*="chat"],
         [class*="coze"] [class*="window"],
         [class*="coze"] [class*="panel"],
         [class*="coze"] [class*="chatbot"],
         [class*="coze"] [class*="ChatBot"],
+        [class*="coze"] [class*="container"],
         [id*="coze"] [class*="chat"],
         [id*="coze"] [class*="window"],
         [id*="coze"] [class*="chatbot"],
-        [id*="coze"] [class*="ChatBot"] {
+        [id*="coze"] [class*="ChatBot"],
+        [id*="coze"] [class*="container"] {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             z-index: 9999 !important;
             width: 100% !important;
             height: 100% !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
         }
         
         /* 隐藏悬浮按钮 */
@@ -394,6 +409,29 @@
                 console.log('ChatClient 已创建:', chatClient);
                 console.log('ChatClient 方法:', Object.keys(chatClient));
                 
+                // 立即尝试显示聊天窗口
+                setTimeout(function() {
+                    try {
+                        // 检查是否有showChatBot方法
+                        if (typeof chatClient.showChatBot === 'function') {
+                            chatClient.showChatBot();
+                            console.log('调用 showChatBot()');
+                        }
+                        // 检查是否有show方法
+                        if (typeof chatClient.show === 'function') {
+                            chatClient.show();
+                            console.log('调用 show()');
+                        }
+                        // 检查是否有open方法
+                        if (typeof chatClient.open === 'function') {
+                            chatClient.open();
+                            console.log('调用 open()');
+                        }
+                    } catch (e) {
+                        console.error('调用显示方法时出错:', e);
+                    }
+                }, 500);
+                
                 // 多种方式确保自动展开
                 function forceOpenChat() {
                     try {
@@ -694,8 +732,18 @@
         // 错误处理
         webSdkScript.onerror = function () {
             console.error('Failed to load Coze Web SDK');
-            document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">加载失败，请刷新页面重试</div>';
+            document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">SDK加载失败，请检查网络连接或刷新页面重试</div>';
         };
+        
+        // 检查SDK是否加载
+        setTimeout(function() {
+            if (typeof CozeWebSDK === 'undefined') {
+                console.error('CozeWebSDK 未定义，SDK可能未加载成功');
+                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">SDK未加载，请检查网络连接</div>';
+            } else {
+                console.log('CozeWebSDK 已加载:', CozeWebSDK);
+            }
+        }, 3000);
     </script>
 </body>
 </html>
