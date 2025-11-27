@@ -381,7 +381,25 @@
                     // 不指定container，使用SDK默认的渲染方式，避免输入框显示问题
                     // 组件属性：自动展开聊天窗口（关键配置）
                     "componentProps": {
-                        "defaultOpen": true
+                        "defaultOpen": true,
+                        // 启用文件上传功能
+                        "enableUpload": true,
+                        "enableFileUpload": true,
+                        // 启用清除历史记录功能
+                        "enableClearHistory": true,
+                        "showClearButton": true,
+                        // 显示工具栏按钮
+                        "showToolbar": true,
+                        "showActions": true
+                    },
+                    // UI配置
+                    "ui": {
+                        // 显示操作按钮
+                        "showActions": true,
+                        // 显示文件上传按钮
+                        "showFileUpload": true,
+                        // 显示清除按钮
+                        "showClearButton": true
                     }
                 });
                 
