@@ -391,6 +391,8 @@
                 
                 // 全局保存 chatClient 引用，方便调试
                 window.cozeChatClient = chatClient;
+                console.log('ChatClient 已创建:', chatClient);
+                console.log('ChatClient 方法:', Object.keys(chatClient));
                 
                 // 多种方式确保自动展开
                 function forceOpenChat() {
@@ -684,7 +686,8 @@
                 
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
-                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置</div>';
+                console.error('错误详情:', error.stack);
+                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置。错误信息：' + error.message + '</div>';
             }
         };
 
