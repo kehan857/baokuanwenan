@@ -113,30 +113,90 @@
             overflow: hidden !important;
         }
         
-        /* 隐藏文件选择按钮（但保留加号按钮用于附件） */
-        [class*="coze"] [class*="file"]:not([class*="attach"]):not([class*="add"]),
-        [class*="coze"] [class*="File"]:not([class*="attach"]):not([class*="add"]),
-        [class*="coze"] [class*="upload"]:not([class*="attach"]):not([class*="add"]),
-        [class*="coze"] [class*="Upload"]:not([class*="attach"]):not([class*="add"]),
-        [id*="coze"] [class*="file"]:not([class*="attach"]):not([class*="add"]),
-        [id*="coze"] [class*="File"]:not([class*="attach"]):not([class*="add"]),
-        [id*="coze"] [class*="upload"]:not([class*="attach"]):not([class*="add"]),
-        [id*="coze"] [class*="Upload"]:not([class*="attach"]):not([class*="add"]),
-        [class*="coze"] button[class*="file"]:not([class*="attach"]):not([class*="add"]),
-        [class*="coze"] button[class*="File"]:not([class*="attach"]):not([class*="add"]),
-        [class*="coze"] [class*="选择文件"],
-        [id*="coze"] [class*="选择文件"],
-        [class*="coze"] [title*="选择文件"],
-        [id*="coze"] [title*="选择文件"] {
+        /* 只隐藏文本形式的"选择文件"按钮，保留图标按钮 */
+        [class*="coze"] [class*="选择文件"]:not(button):not([role="button"]),
+        [id*="coze"] [class*="选择文件"]:not(button):not([role="button"]),
+        [class*="coze"] [title*="选择文件"]:not(button):not([role="button"]),
+        [id*="coze"] [title*="选择文件"]:not(button):not([role="button"]) {
             display: none !important;
             visibility: hidden !important;
-            height: 0 !important;
-            width: 0 !important;
-            overflow: hidden !important;
-            opacity: 0 !important;
         }
         
-        /* 隐藏文件输入框 */
+        /* 确保加号按钮（上传文件）正常显示 */
+        [class*="coze"] button[class*="add"],
+        [class*="coze"] button[class*="Add"],
+        [class*="coze"] button[class*="attach"],
+        [class*="coze"] button[class*="Attach"],
+        [class*="coze"] [class*="add-button"],
+        [class*="coze"] [class*="attach-button"],
+        [id*="coze"] button[class*="add"],
+        [id*="coze"] button[class*="Add"],
+        [id*="coze"] button[class*="attach"],
+        [id*="coze"] button[class*="Attach"],
+        [id*="coze"] [class*="add-button"],
+        [id*="coze"] [class*="attach-button"],
+        [class*="coze"] button[aria-label*="添加"],
+        [class*="coze"] button[aria-label*="附件"],
+        [class*="coze"] button[title*="添加"],
+        [class*="coze"] button[title*="附件"] {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        
+        /* 确保清除历史记录按钮正常显示 */
+        [class*="coze"] button[class*="clear"],
+        [class*="coze"] button[class*="Clear"],
+        [class*="coze"] button[class*="reset"],
+        [class*="coze"] button[class*="Reset"],
+        [class*="coze"] button[class*="new"],
+        [class*="coze"] button[class*="New"],
+        [class*="coze"] [class*="clear-button"],
+        [class*="coze"] [class*="reset-button"],
+        [id*="coze"] button[class*="clear"],
+        [id*="coze"] button[class*="Clear"],
+        [id*="coze"] button[class*="reset"],
+        [id*="coze"] button[class*="Reset"],
+        [id*="coze"] button[class*="new"],
+        [id*="coze"] button[class*="New"],
+        [id*="coze"] [class*="clear-button"],
+        [id*="coze"] [class*="reset-button"],
+        [class*="coze"] button[aria-label*="清除"],
+        [class*="coze"] button[aria-label*="重置"],
+        [class*="coze"] button[aria-label*="新对话"],
+        [class*="coze"] button[title*="清除"],
+        [class*="coze"] button[title*="重置"],
+        [class*="coze"] button[title*="新对话"] {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        
+        /* 确保发送按钮正常显示 */
+        [class*="coze"] button[class*="send"],
+        [class*="coze"] button[class*="Send"],
+        [class*="coze"] button[class*="submit"],
+        [class*="coze"] button[class*="Submit"],
+        [class*="coze"] [class*="send-button"],
+        [id*="coze"] button[class*="send"],
+        [id*="coze"] button[class*="Send"],
+        [id*="coze"] button[class*="submit"],
+        [id*="coze"] button[class*="Submit"],
+        [id*="coze"] [class*="send-button"],
+        [class*="coze"] button[aria-label*="发送"],
+        [class*="coze"] button[title*="发送"] {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: auto !important;
+            height: auto !important;
+        }
+        
+        /* 隐藏文件输入框（但保留按钮） */
         [class*="coze"] input[type="file"],
         [id*="coze"] input[type="file"] {
             display: none !important;
