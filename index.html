@@ -408,28 +408,41 @@
                 console.log('ChatClient 已创建:', chatClient);
                 console.log('ChatClient 方法:', Object.keys(chatClient));
                 
-                // 立即尝试显示聊天窗口
-                setTimeout(function() {
+                // 当asstBtn.isNeed为false时，必须使用showChatBot()方法显示窗口
+                // 这是SDK的要求：隐藏悬浮按钮后，需要手动调用showChatBot()
+                function showChatWindow() {
                     try {
-                        // 检查是否有showChatBot方法
+                        // 方法1: 使用showChatBot方法（当asstBtn.isNeed为false时必须使用）
                         if (typeof chatClient.showChatBot === 'function') {
                             chatClient.showChatBot();
-                            console.log('调用 showChatBot()');
+                            console.log('调用 showChatBot() - 成功');
+                            return true;
                         }
-                        // 检查是否有show方法
+                        // 方法2: 尝试show方法
                         if (typeof chatClient.show === 'function') {
                             chatClient.show();
-                            console.log('调用 show()');
+                            console.log('调用 show() - 成功');
+                            return true;
                         }
-                        // 检查是否有open方法
+                        // 方法3: 尝试open方法
                         if (typeof chatClient.open === 'function') {
                             chatClient.open();
-                            console.log('调用 open()');
+                            console.log('调用 open() - 成功');
+                            return true;
                         }
+                        console.warn('未找到显示窗口的方法');
                     } catch (e) {
                         console.error('调用显示方法时出错:', e);
                     }
-                }, 500);
+                    return false;
+                }
+                
+                // 立即尝试显示聊天窗口（多次尝试确保成功）
+                setTimeout(showChatWindow, 100);
+                setTimeout(showChatWindow, 300);
+                setTimeout(showChatWindow, 500);
+                setTimeout(showChatWindow, 1000);
+                setTimeout(showChatWindow, 2000);
                 
                 // 多种方式确保自动展开
                 function forceOpenChat() {
@@ -498,6 +511,9 @@
                 if (chatClient && typeof chatClient.on === 'function') {
                     chatClient.on('ready', function() {
                         console.log('SDK ready 事件触发');
+                        // 当ready时，优先使用showChatBot方法（因为asstBtn.isNeed为false）
+                        showChatWindow();
+                        // 备用方法
                         forceOpenChat();
                     });
                 }
