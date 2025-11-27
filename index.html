@@ -33,7 +33,7 @@
             display: none !important;
         }
         
-        /* 修复输入框显示 */
+        /* 修复输入框显示 - 确保输入框容器正常显示 */
         [class*="coze"] [class*="input"],
         [class*="coze"] [class*="Input"],
         [id*="coze"] [class*="input"],
@@ -41,40 +41,31 @@
             display: flex !important;
             align-items: center !important;
             width: 100% !important;
+            min-height: 44px !important;
             box-sizing: border-box !important;
         }
         
         /* 确保输入框本身正常显示 */
         [class*="coze"] [contenteditable="true"],
+        [class*="coze"] [contenteditable],
         [class*="coze"] textarea,
         [class*="coze"] input[type="text"],
         [id*="coze"] [contenteditable="true"],
+        [id*="coze"] [contenteditable],
         [id*="coze"] textarea,
         [id*="coze"] input[type="text"] {
             flex: 1 !important;
             min-width: 0 !important;
+            min-height: 36px !important;
             padding: 8px 12px !important;
             border: none !important;
             outline: none !important;
             font-size: 14px !important;
             line-height: 1.5 !important;
             background: transparent !important;
-        }
-        
-        /* 隐藏输入框中不需要的文本元素（如"66"等） */
-        [class*="coze"] [class*="input"] > span:not([contenteditable]),
-        [class*="coze"] [class*="Input"] > span:not([contenteditable]),
-        [id*="coze"] [class*="input"] > span:not([contenteditable]),
-        [id*="coze"] [class*="Input"] > span:not([contenteditable]) {
-            display: none !important;
-        }
-        
-        /* 隐藏输入框中的占位符文本（如果不是真正的placeholder） */
-        [class*="coze"] [class*="input"] > div:not([contenteditable]),
-        [class*="coze"] [class*="Input"] > div:not([contenteditable]),
-        [id*="coze"] [class*="input"] > div:not([contenteditable]),
-        [id*="coze"] [class*="Input"] > div:not([contenteditable]) {
-            display: none !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         
         /* 确保输入框容器中的按钮正常显示 */
@@ -86,6 +77,18 @@
             align-items: center !important;
             justify-content: center !important;
             flex-shrink: 0 !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+        }
+        
+        /* 确保输入框底部区域正常显示 */
+        [class*="coze"] [class*="footer"],
+        [class*="coze"] [class*="Footer"],
+        [id*="coze"] [class*="footer"],
+        [id*="coze"] [class*="Footer"] {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
     </style>
 </head>
@@ -287,35 +290,47 @@
                         opened = forceOpenChat();
                     }
                     
-                    // 修复输入框显示：隐藏不需要的文本元素
+                    // 修复输入框显示：确保输入框正常显示
                     try {
+                        // 确保输入框容器可见
                         var inputContainers = document.querySelectorAll('[class*="coze"] [class*="input"], [class*="coze"] [class*="Input"], [id*="coze"] [class*="input"], [id*="coze"] [class*="Input"]');
                         inputContainers.forEach(function(container) {
                             if (container) {
-                                // 遍历所有子元素
-                                var children = container.children;
-                                for (var i = 0; i < children.length; i++) {
-                                    var child = children[i];
-                                    var text = child.textContent || child.innerText || '';
-                                    var isEditable = child.hasAttribute('contenteditable') || child.tagName === 'INPUT' || child.tagName === 'TEXTAREA';
-                                    
-                                    // 如果不是可编辑元素，且包含奇怪的文本（如"66", "chatin"等），隐藏它
-                                    if (!isEditable && (
-                                        /^\d+$/.test(text.trim()) || // 纯数字
-                                        text.trim().length < 3 || // 很短的文本
-                                        /^[a-z]+$/i.test(text.trim()) && text.trim().length < 6 // 短字母串
-                                    )) {
-                                        child.style.display = 'none';
-                                        child.style.visibility = 'hidden';
-                                        child.style.width = '0';
-                                        child.style.height = '0';
-                                        child.style.opacity = '0';
-                                    }
-                                }
+                                container.style.display = 'flex';
+                                container.style.visibility = 'visible';
+                                container.style.opacity = '1';
+                                container.style.minHeight = '44px';
+                                
+                                // 确保输入框本身可见
+                                var inputs = container.querySelectorAll('[contenteditable], [contenteditable="true"], textarea, input[type="text"]');
+                                inputs.forEach(function(input) {
+                                    input.style.display = 'block';
+                                    input.style.visibility = 'visible';
+                                    input.style.opacity = '1';
+                                    input.style.minHeight = '36px';
+                                    input.style.padding = '8px 12px';
+                                    input.style.flex = '1';
+                                });
+                                
+                                // 确保按钮可见
+                                var buttons = container.querySelectorAll('button');
+                                buttons.forEach(function(btn) {
+                                    btn.style.display = 'flex';
+                                    btn.style.visibility = 'visible';
+                                    btn.style.opacity = '1';
+                                });
                             }
                         });
+                        
+                        // 确保底部输入区域可见
+                        var footers = document.querySelectorAll('[class*="coze"] [class*="footer"], [class*="coze"] [class*="Footer"], [id*="coze"] [class*="footer"], [id*="coze"] [class*="Footer"]');
+                        footers.forEach(function(footer) {
+                            footer.style.display = 'flex';
+                            footer.style.visibility = 'visible';
+                            footer.style.opacity = '1';
+                        });
                     } catch (e) {
-                        // 忽略错误
+                        console.log('修复输入框显示时出错:', e);
                     }
                 });
                 
