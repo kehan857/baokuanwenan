@@ -32,6 +32,54 @@
         [id*="coze"][style*="position: fixed"] {
             display: none !important;
         }
+        
+        /* 修复输入框显示问题 */
+        [class*="coze"] input[type="text"],
+        [class*="coze"] input[type="textarea"],
+        [class*="coze"] textarea,
+        [class*="coze"] [contenteditable="true"],
+        [id*="coze"] input[type="text"],
+        [id*="coze"] input[type="textarea"],
+        [id*="coze"] textarea,
+        [id*="coze"] [contenteditable="true"] {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+            font-size: 14px !important;
+            color: #333 !important;
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* 隐藏输入框中的调试文本或占位符问题 */
+        [class*="coze"] [class*="input"]::before,
+        [class*="coze"] [class*="input"]::after,
+        [id*="coze"] [class*="input"]::before,
+        [id*="coze"] [class*="input"]::after {
+            display: none !important;
+            content: none !important;
+        }
+        
+        /* 确保输入区域正常显示 */
+        [class*="coze"] [class*="input-container"],
+        [class*="coze"] [class*="input-wrapper"],
+        [id*="coze"] [class*="input-container"],
+        [id*="coze"] [class*="input-wrapper"] {
+            position: relative !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* 隐藏SDK调试信息 */
+        [class*="web_sdk"],
+        [id*="web_sdk"],
+        [class*="banner"],
+        [id*="banner"] {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -48,8 +96,39 @@
             const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
             
             // 生成新的会话ID，每次刷新页面时都会生成新的
+            // 使用更强大的唯一ID生成方式，确保每次都是新会话
             function generateSessionId() {
-                return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                // 组合时间戳、随机数和用户代理信息，确保唯一性
+                const timestamp = Date.now();
+                const random = Math.random().toString(36).substring(2, 15);
+                const random2 = Math.random().toString(36).substring(2, 15);
+                const userAgent = navigator.userAgent ? navigator.userAgent.substring(0, 10) : '';
+                return 'session_' + timestamp + '_' + random + '_' + random2 + '_' + userAgent;
+            }
+            
+            // 清除可能存在的会话缓存
+            try {
+                // 清除localStorage中可能存在的会话数据
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && (key.indexOf('coze') >= 0 || key.indexOf('session') >= 0 || key.indexOf('chat') >= 0)) {
+                        keysToRemove.push(key);
+                    }
+                }
+                keysToRemove.forEach(key => localStorage.removeItem(key));
+                
+                // 清除sessionStorage中可能存在的会话数据
+                const sessionKeysToRemove = [];
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    if (key && (key.indexOf('coze') >= 0 || key.indexOf('session') >= 0 || key.indexOf('chat') >= 0)) {
+                        sessionKeysToRemove.push(key);
+                    }
+                }
+                sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
+            } catch (e) {
+                console.log('清除缓存时出错（可忽略）:', e);
             }
             
             try {
@@ -61,7 +140,10 @@
                             "workflowId": "7577062163073941540"
                         },
                         // 每次刷新页面时生成新的会话ID
-                        "sessionId": generateSessionId()
+                        // 确保每次打开都是全新的会话
+                        "sessionId": generateSessionId(),
+                        // 禁用会话持久化，确保每次都是新会话
+                        "persistSession": false
                     },
                     "auth": {
                         "type": "token",
