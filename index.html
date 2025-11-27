@@ -358,14 +358,27 @@
                     "componentProps": {
                         "defaultOpen": true
                     },
-                    // UI配置
+                    // UI配置 - 使用SDK默认样式，确保输入框显示正确
                     "ui": {
-                        // 显示操作按钮
-                        "showActions": true,
-                        // 显示文件上传按钮
-                        "showFileUpload": true,
-                        // 显示清除按钮
-                        "showClearButton": true
+                        "base": {
+                            "lang": "zh-CN",
+                            "layout": window.innerWidth < 768 ? "mobile" : "pc"
+                        },
+                        "header": {
+                            "isShow": true,
+                            "isNeedClose": true
+                        },
+                        "asstBtn": {
+                            "isNeed": false // 隐藏悬浮按钮，因为使用embed模式
+                        },
+                        "footer": {
+                            "isShow": true, // 显示底部"Powered by coze"
+                            "expressionText": "Powered by coze. AI-generated content for reference only."
+                        },
+                        "chatBot": {
+                            "title": "爆款文案生成",
+                            "uploadable": true // 启用文件上传功能
+                        }
                     }
                 });
                 
