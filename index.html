@@ -510,6 +510,7 @@
                 // 延迟执行一次，确保隐藏"66"等元素
                 setTimeout(function() {
                     try {
+                        // 隐藏数字标签
                         var allElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
                         allElements.forEach(function(el) {
                             var text = el.textContent || el.innerText || '';
@@ -522,8 +523,81 @@
                                 el.style.opacity = '0';
                             }
                         });
+                        
+                        // 确保所有重要按钮正常显示
+                        var allButtons = document.querySelectorAll('[class*="coze"] button, [id*="coze"] button, [class*="coze"] [role="button"], [id*="coze"] [role="button"]');
+                        allButtons.forEach(function(btn) {
+                            var text = btn.textContent || btn.innerText || '';
+                            var className = btn.className || '';
+                            var ariaLabel = btn.getAttribute('aria-label') || '';
+                            var title = btn.getAttribute('title') || '';
+                            var innerHTML = btn.innerHTML || '';
+                            
+                            // 检查是否是加号、发送、清除等按钮
+                            var isImportantButton = 
+                                className.toLowerCase().indexOf('add') >= 0 ||
+                                className.toLowerCase().indexOf('attach') >= 0 ||
+                                className.toLowerCase().indexOf('send') >= 0 ||
+                                className.toLowerCase().indexOf('submit') >= 0 ||
+                                className.toLowerCase().indexOf('clear') >= 0 ||
+                                className.toLowerCase().indexOf('reset') >= 0 ||
+                                className.toLowerCase().indexOf('new') >= 0 ||
+                                className.toLowerCase().indexOf('delete') >= 0 ||
+                                ariaLabel.toLowerCase().indexOf('添加') >= 0 ||
+                                ariaLabel.toLowerCase().indexOf('附件') >= 0 ||
+                                ariaLabel.toLowerCase().indexOf('发送') >= 0 ||
+                                ariaLabel.toLowerCase().indexOf('清除') >= 0 ||
+                                ariaLabel.toLowerCase().indexOf('重置') >= 0 ||
+                                ariaLabel.toLowerCase().indexOf('新对话') >= 0 ||
+                                title.toLowerCase().indexOf('添加') >= 0 ||
+                                title.toLowerCase().indexOf('附件') >= 0 ||
+                                title.toLowerCase().indexOf('发送') >= 0 ||
+                                title.toLowerCase().indexOf('清除') >= 0 ||
+                                title.toLowerCase().indexOf('重置') >= 0 ||
+                                title.toLowerCase().indexOf('新对话') >= 0 ||
+                                innerHTML.indexOf('+') >= 0 ||
+                                innerHTML.indexOf('✕') >= 0 ||
+                                innerHTML.indexOf('×') >= 0 ||
+                                innerHTML.indexOf('🗑') >= 0 ||
+                                innerHTML.indexOf('📎') >= 0 ||
+                                innerHTML.indexOf('📤') >= 0 ||
+                                innerHTML.indexOf('send') >= 0 ||
+                                innerHTML.indexOf('Send') >= 0;
+                            
+                            if (isImportantButton) {
+                                btn.style.display = 'flex';
+                                btn.style.visibility = 'visible';
+                                btn.style.opacity = '1';
+                                btn.style.width = 'auto';
+                                btn.style.height = 'auto';
+                                btn.style.minWidth = '32px';
+                                btn.style.minHeight = '32px';
+                            }
+                        });
+                        
+                        // 修复输入框布局
+                        var inputContainers = document.querySelectorAll('[class*="coze"] [class*="input"], [class*="coze"] [class*="Input"], [id*="coze"] [class*="input"], [id*="coze"] [class*="Input"]');
+                        inputContainers.forEach(function(container) {
+                            if (container) {
+                                // 确保容器使用flex布局
+                                container.style.display = 'flex';
+                                container.style.flexDirection = 'row';
+                                container.style.alignItems = 'center';
+                                container.style.width = '100%';
+                                container.style.boxSizing = 'border-box';
+                                container.style.gap = '8px';
+                                
+                                // 找到输入框本身
+                                var input = container.querySelector('[contenteditable], input, textarea');
+                                if (input) {
+                                    input.style.flex = '1';
+                                    input.style.minWidth = '0';
+                                    input.style.width = 'auto';
+                                }
+                            }
+                        });
                     } catch (e) {
-                        // 忽略错误
+                        console.log('修复布局时出错:', e);
                     }
                 }, 2000);
                 
