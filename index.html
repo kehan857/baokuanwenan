@@ -14,37 +14,16 @@
             overflow: hidden;
         }
         
-        /* 强制显示 Coze 聊天窗口 - 使用更宽泛的选择器 */
-        [class*="coze"],
-        [id*="coze"],
-        [class*="Coze"],
-        [id*="Coze"] {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        /* 确保聊天窗口容器显示 */
+        /* 强制显示 Coze 聊天窗口 */
         [class*="coze"] [class*="chat"],
         [class*="coze"] [class*="window"],
         [class*="coze"] [class*="panel"],
-        [class*="coze"] [class*="chatbot"],
-        [class*="coze"] [class*="ChatBot"],
-        [class*="coze"] [class*="container"],
         [id*="coze"] [class*="chat"],
-        [id*="coze"] [class*="window"],
-        [id*="coze"] [class*="chatbot"],
-        [id*="coze"] [class*="ChatBot"],
-        [id*="coze"] [class*="container"] {
+        [id*="coze"] [class*="window"] {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             z-index: 9999 !important;
-            width: 100% !important;
-            height: 100% !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
         }
         
         /* 隐藏悬浮按钮 */
@@ -54,169 +33,66 @@
             display: none !important;
         }
         
-        /* 完全移除输入框相关的CSS，让SDK使用默认样式 */
-        /* 不添加任何输入框相关的样式覆盖 */
-        
-        /* 隐藏SDK调试信息和banner */
-        [class*="web_sdk"],
-        [id*="web_sdk"],
-        [class*="banner"],
-        [id*="banner"],
-        [class*="web_sdk_official_banner"],
-        [id*="web_sdk_official_banner"] {
-            display: none !important;
-            visibility: hidden !important;
-            height: 0 !important;
-            overflow: hidden !important;
-        }
-        
-        /* 只隐藏文本形式的"选择文件"按钮，保留图标按钮 */
-        [class*="coze"] [class*="选择文件"]:not(button):not([role="button"]),
-        [id*="coze"] [class*="选择文件"]:not(button):not([role="button"]),
-        [class*="coze"] [title*="选择文件"]:not(button):not([role="button"]),
-        [id*="coze"] [title*="选择文件"]:not(button):not([role="button"]) {
-            display: none !important;
-            visibility: hidden !important;
-        }
-        
-        /* 确保加号按钮（上传文件）正常显示 */
-        [class*="coze"] button[class*="add"],
-        [class*="coze"] button[class*="Add"],
-        [class*="coze"] button[class*="attach"],
-        [class*="coze"] button[class*="Attach"],
-        [class*="coze"] [class*="add-button"],
-        [class*="coze"] [class*="attach-button"],
-        [id*="coze"] button[class*="add"],
-        [id*="coze"] button[class*="Add"],
-        [id*="coze"] button[class*="attach"],
-        [id*="coze"] button[class*="Attach"],
-        [id*="coze"] [class*="add-button"],
-        [id*="coze"] [class*="attach-button"],
-        [class*="coze"] button[aria-label*="添加"],
-        [class*="coze"] button[aria-label*="附件"],
-        [class*="coze"] button[title*="添加"],
-        [class*="coze"] button[title*="附件"] {
+        /* 修复输入框显示 */
+        [class*="coze"] [class*="input"],
+        [class*="coze"] [class*="Input"],
+        [id*="coze"] [class*="input"],
+        [id*="coze"] [class*="Input"] {
             display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            width: auto !important;
-            height: auto !important;
-        }
-        
-        /* 确保清除历史记录按钮正常显示 */
-        [class*="coze"] button[class*="clear"],
-        [class*="coze"] button[class*="Clear"],
-        [class*="coze"] button[class*="reset"],
-        [class*="coze"] button[class*="Reset"],
-        [class*="coze"] button[class*="new"],
-        [class*="coze"] button[class*="New"],
-        [class*="coze"] [class*="clear-button"],
-        [class*="coze"] [class*="reset-button"],
-        [id*="coze"] button[class*="clear"],
-        [id*="coze"] button[class*="Clear"],
-        [id*="coze"] button[class*="reset"],
-        [id*="coze"] button[class*="Reset"],
-        [id*="coze"] button[class*="new"],
-        [id*="coze"] button[class*="New"],
-        [id*="coze"] [class*="clear-button"],
-        [id*="coze"] [class*="reset-button"],
-        [class*="coze"] button[aria-label*="清除"],
-        [class*="coze"] button[aria-label*="重置"],
-        [class*="coze"] button[aria-label*="新对话"],
-        [class*="coze"] button[title*="清除"],
-        [class*="coze"] button[title*="重置"],
-        [class*="coze"] button[title*="新对话"] {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            width: auto !important;
-            height: auto !important;
-        }
-        
-        /* 确保发送按钮正常显示 */
-        [class*="coze"] button[class*="send"],
-        [class*="coze"] button[class*="Send"],
-        [class*="coze"] button[class*="submit"],
-        [class*="coze"] button[class*="Submit"],
-        [class*="coze"] [class*="send-button"],
-        [id*="coze"] button[class*="send"],
-        [id*="coze"] button[class*="Send"],
-        [id*="coze"] button[class*="submit"],
-        [id*="coze"] button[class*="Submit"],
-        [id*="coze"] [class*="send-button"],
-        [class*="coze"] button[aria-label*="发送"],
-        [class*="coze"] button[title*="发送"] {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            width: auto !important;
-            height: auto !important;
-        }
-        
-        /* 隐藏文件输入框（但保留按钮） */
-        [class*="coze"] input[type="file"],
-        [id*="coze"] input[type="file"] {
-            display: none !important;
-            visibility: hidden !important;
-            position: absolute !important;
-            left: -9999px !important;
-            opacity: 0 !important;
-        }
-        
-        /* 确保输入框底部工具栏正常显示 */
-        [class*="coze"] [class*="toolbar"],
-        [class*="coze"] [class*="Toolbar"],
-        [class*="coze"] [class*="footer"],
-        [class*="coze"] [class*="Footer"],
-        [id*="coze"] [class*="toolbar"],
-        [id*="coze"] [class*="Toolbar"],
-        [id*="coze"] [class*="footer"],
-        [id*="coze"] [class*="Footer"] {
-            display: flex !important;
-            flex-direction: row !important;
             align-items: center !important;
-            justify-content: space-between !important;
             width: 100% !important;
-            padding: 8px 12px !important;
             box-sizing: border-box !important;
         }
         
-        /* 隐藏数字标签（如"66"） */
-        [class*="coze"] [class*="input"] > span:first-child,
-        [class*="coze"] [class*="Input"] > span:first-child,
-        [id*="coze"] [class*="input"] > span:first-child,
-        [id*="coze"] [class*="Input"] > span:first-child,
-        [class*="coze"] [class*="input"] > div:first-child:not([contenteditable]),
-        [class*="coze"] [class*="Input"] > div:first-child:not([contenteditable]),
-        [id*="coze"] [class*="input"] > div:first-child:not([contenteditable]),
-        [id*="coze"] [class*="Input"] > div:first-child:not([contenteditable]) {
-            display: none !important;
-            visibility: hidden !important;
-            width: 0 !important;
-            height: 0 !important;
-            overflow: hidden !important;
-            opacity: 0 !important;
+        /* 确保输入框本身正常显示 */
+        [class*="coze"] [contenteditable="true"],
+        [class*="coze"] textarea,
+        [class*="coze"] input[type="text"],
+        [id*="coze"] [contenteditable="true"],
+        [id*="coze"] textarea,
+        [id*="coze"] input[type="text"] {
+            flex: 1 !important;
+            min-width: 0 !important;
+            padding: 8px 12px !important;
+            border: none !important;
+            outline: none !important;
+            font-size: 14px !important;
+            line-height: 1.5 !important;
+            background: transparent !important;
         }
         
-        /* 隐藏包含数字的文本节点（通用方法） */
-        [class*="coze"] [class*="input"] *:empty,
-        [class*="coze"] [class*="Input"] *:empty,
-        [id*="coze"] [class*="input"] *:empty,
-        [id*="coze"] [class*="Input"] *:empty {
+        /* 隐藏输入框中不需要的文本元素（如"66"等） */
+        [class*="coze"] [class*="input"] > span:not([contenteditable]),
+        [class*="coze"] [class*="Input"] > span:not([contenteditable]),
+        [id*="coze"] [class*="input"] > span:not([contenteditable]),
+        [id*="coze"] [class*="Input"] > span:not([contenteditable]) {
             display: none !important;
         }
         
-        /* 隐藏输入框左侧的数字或图标 */
-        [class*="coze"] [class*="input"]::before,
-        [class*="coze"] [class*="Input"]::before,
-        [id*="coze"] [class*="input"]::before,
-        [id*="coze"] [class*="Input"]::before {
+        /* 隐藏输入框中的占位符文本（如果不是真正的placeholder） */
+        [class*="coze"] [class*="input"] > div:not([contenteditable]),
+        [class*="coze"] [class*="Input"] > div:not([contenteditable]),
+        [id*="coze"] [class*="input"] > div:not([contenteditable]),
+        [id*="coze"] [class*="Input"] > div:not([contenteditable]) {
             display: none !important;
-            content: none !important;
+        }
+        
+        /* 确保输入框容器中的按钮正常显示 */
+        [class*="coze"] [class*="input"] button,
+        [class*="coze"] [class*="Input"] button,
+        [id*="coze"] [class*="input"] button,
+        [id*="coze"] [class*="Input"] button {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            flex-shrink: 0 !important;
         }
     </style>
 </head>
 <body>
+    <!-- 创建容器用于嵌入聊天窗口 -->
+    <div id="coze-chat-container" style="width: 100%; height: 100vh; position: fixed; top: 0; left: 0; z-index: 9999;"></div>
+    
     <script type="text/javascript">
         var webSdkScript = document.createElement('script');
         webSdkScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
@@ -226,64 +102,15 @@
             // 服务访问令牌（SAT）
             const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
             
-            // 生成设备唯一的用户ID（每个设备固定，不同设备不同）
-            function generateDeviceUserId() {
-                // 尝试从localStorage获取已存在的设备ID
-                let deviceId = localStorage.getItem('coze_device_user_id');
-                
-                if (!deviceId) {
-                    // 生成基于设备特征的唯一ID
-                    const userAgent = navigator.userAgent || '';
-                    const language = navigator.language || '';
-                    const platform = navigator.platform || '';
-                    const screenSize = (screen.width || 0) + 'x' + (screen.height || 0);
-                    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-                    
-                    // 组合设备特征生成唯一ID
-                    const deviceFingerprint = userAgent.substring(0, 50) + language + platform + screenSize + timezone;
-                    const hash = deviceFingerprint.split('').reduce(function(a, b) {
-                        a = ((a << 5) - a) + b.charCodeAt(0);
-                        return a & a;
-                    }, 0);
-                    
-                    // 生成设备ID
-                    deviceId = 'device_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 9);
-                    
-                    // 保存到localStorage，确保同一设备始终使用相同的ID
-                    localStorage.setItem('coze_device_user_id', deviceId);
-                }
-                
-                return deviceId;
-            }
-            
-            // 生成新的会话ID，每次刷新页面时都会生成新的
-            // 使用URL参数 + 时间戳 + 随机数，确保每次都是新会话
-            function generateSessionId() {
-                // 强制生成新的随机参数，每次刷新都不同
-                const urlRandom = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15) + Date.now().toString(36);
-                const newUrl = window.location.pathname + '?r=' + urlRandom + (window.location.hash || '');
-                window.history.replaceState({}, '', newUrl);
-                
-                // 组合时间戳、随机数和URL参数，确保唯一性
-                const timestamp = Date.now();
-                const random = Math.random().toString(36).substring(2, 15);
-                const random2 = Math.random().toString(36).substring(2, 15);
-                const random3 = Math.random().toString(36).substring(2, 15);
-                return 'session_' + timestamp + '_' + random + '_' + random2 + '_' + random3 + '_' + urlRandom;
-            }
-            
-            // 清除所有可能存在的会话缓存（更彻底）
-            // 在SDK初始化之前就清除，确保不会复用旧会话
+            // 清除所有可能存在的会话缓存，确保每次都是新会话
             try {
-                // 清除localStorage中所有相关数据（包括所有可能的变体）
-                const allKeys = Object.keys(localStorage);
-                allKeys.forEach(key => {
+                // 清除localStorage中所有Coze相关的数据
+                const localStorageKeys = Object.keys(localStorage);
+                localStorageKeys.forEach(key => {
                     if (key && (
                         key.toLowerCase().indexOf('coze') >= 0 || 
                         key.toLowerCase().indexOf('session') >= 0 || 
                         key.toLowerCase().indexOf('chat') >= 0 ||
-                        key.toLowerCase().indexOf('app') >= 0 ||
-                        key.toLowerCase().indexOf('workflow') >= 0 ||
                         key.toLowerCase().indexOf('7576948828981608511') >= 0 || // App ID
                         key.toLowerCase().indexOf('7577062163073941540') >= 0     // Workflow ID
                     )) {
@@ -291,15 +118,13 @@
                     }
                 });
                 
-                // 清除sessionStorage中所有相关数据
-                const allSessionKeys = Object.keys(sessionStorage);
-                allSessionKeys.forEach(key => {
+                // 清除sessionStorage中所有Coze相关的数据
+                const sessionStorageKeys = Object.keys(sessionStorage);
+                sessionStorageKeys.forEach(key => {
                     if (key && (
                         key.toLowerCase().indexOf('coze') >= 0 || 
                         key.toLowerCase().indexOf('session') >= 0 || 
                         key.toLowerCase().indexOf('chat') >= 0 ||
-                        key.toLowerCase().indexOf('app') >= 0 ||
-                        key.toLowerCase().indexOf('workflow') >= 0 ||
                         key.toLowerCase().indexOf('7576948828981608511') >= 0 ||
                         key.toLowerCase().indexOf('7577062163073941540') >= 0
                     )) {
@@ -323,30 +148,30 @@
                         });
                     }).catch(() => {});
                 }
-                
-                // 清除Cookie中可能存在的会话信息
-                document.cookie.split(";").forEach(function(c) { 
-                    const cookieName = c.split("=")[0].trim();
-                    if (cookieName && (
-                        cookieName.toLowerCase().indexOf('coze') >= 0 ||
-                        cookieName.toLowerCase().indexOf('session') >= 0 ||
-                        cookieName.toLowerCase().indexOf('chat') >= 0
-                    )) {
-                        document.cookie = cookieName + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/";
-                    }
-                });
             } catch (e) {
                 console.log('清除缓存时出错（可忽略）:', e);
             }
             
+            // 生成新的会话ID，每次刷新页面时都会生成新的
+            // 使用时间戳 + 随机数 + URL参数确保唯一性
+            function generateSessionId() {
+                const timestamp = Date.now();
+                const random1 = Math.random().toString(36).substr(2, 9);
+                const random2 = Math.random().toString(36).substr(2, 9);
+                const urlParam = Math.random().toString(36).substr(2, 9);
+                // 添加URL参数，确保每次访问都是新的
+                const newUrl = window.location.pathname + '?t=' + timestamp + '&r=' + urlParam;
+                window.history.replaceState({}, '', newUrl);
+                return 'session_' + timestamp + '_' + random1 + '_' + random2;
+            }
+            
             try {
-                // 生成设备唯一的用户ID（每个设备固定）
-                const deviceUserId = generateDeviceUserId();
-                console.log('设备用户ID:', deviceUserId);
-                
                 // 生成新的会话ID（在初始化之前）
                 const newSessionId = generateSessionId();
                 console.log('新会话ID:', newSessionId);
+                
+                // 生成唯一的用户ID（每次访问都不同，确保新会话）
+                const uniqueUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                 
                 const chatClient = new CozeWebSDK.WebChatClient({
                     "config": {
@@ -356,9 +181,8 @@
                             "workflowId": "7577062163073941540"
                         },
                         // 每次刷新页面时生成新的会话ID
-                        // 确保每次打开都是全新的会话
                         "sessionId": newSessionId,
-                        // 禁用历史记录
+                        // 禁用历史记录，确保每次都是新会话
                         "enableHistory": false
                     },
                     "auth": {
@@ -369,80 +193,21 @@
                             return serviceToken;
                         }
                     },
-                    // 用户信息：根据设备生成唯一ID，不同设备看到不同的对话记录
+                    // 用户信息：每次生成新的用户ID，确保不同会话
                     "userInfo": {
-                        "id": deviceUserId,
-                        "nickname": "用户"
+                        "id": uniqueUserId,
+                        "nickname": "访客"
                     },
-                    // 使用SDK默认的渲染方式，最小化自定义配置
+                    // 指定容器，直接嵌入到页面中
+                    "container": document.getElementById('coze-chat-container'),
                     // 组件属性：自动展开聊天窗口（关键配置）
                     "componentProps": {
                         "defaultOpen": true
-                    },
-                    // UI配置 - 使用SDK默认样式，确保输入框显示正确
-                    "ui": {
-                        "base": {
-                            "lang": "zh-CN",
-                            "layout": window.innerWidth < 768 ? "mobile" : "pc"
-                        },
-                        "header": {
-                            "isShow": true,
-                            "isNeedClose": true
-                        },
-                        "asstBtn": {
-                            "isNeed": false // 隐藏悬浮按钮，使用直接嵌入模式
-                        },
-                        "footer": {
-                            "isShow": true, // 显示底部"Powered by coze"
-                            "expressionText": "Powered by coze. AI-generated content for reference only."
-                        },
-                        "chatBot": {
-                            "title": "爆款文案生成",
-                            "uploadable": true // 启用文件上传功能
-                        }
                     }
                 });
                 
                 // 全局保存 chatClient 引用，方便调试
                 window.cozeChatClient = chatClient;
-                console.log('ChatClient 已创建:', chatClient);
-                console.log('ChatClient 方法:', Object.keys(chatClient));
-                
-                // 当asstBtn.isNeed为false时，必须使用showChatBot()方法显示窗口
-                // 这是SDK的要求：隐藏悬浮按钮后，需要手动调用showChatBot()
-                function showChatWindow() {
-                    try {
-                        // 方法1: 使用showChatBot方法（当asstBtn.isNeed为false时必须使用）
-                        if (typeof chatClient.showChatBot === 'function') {
-                            chatClient.showChatBot();
-                            console.log('调用 showChatBot() - 成功');
-                            return true;
-                        }
-                        // 方法2: 尝试show方法
-                        if (typeof chatClient.show === 'function') {
-                            chatClient.show();
-                            console.log('调用 show() - 成功');
-                            return true;
-                        }
-                        // 方法3: 尝试open方法
-                        if (typeof chatClient.open === 'function') {
-                            chatClient.open();
-                            console.log('调用 open() - 成功');
-                            return true;
-                        }
-                        console.warn('未找到显示窗口的方法');
-                    } catch (e) {
-                        console.error('调用显示方法时出错:', e);
-                    }
-                    return false;
-                }
-                
-                // 立即尝试显示聊天窗口（多次尝试确保成功）
-                setTimeout(showChatWindow, 100);
-                setTimeout(showChatWindow, 300);
-                setTimeout(showChatWindow, 500);
-                setTimeout(showChatWindow, 1000);
-                setTimeout(showChatWindow, 2000);
                 
                 // 多种方式确保自动展开
                 function forceOpenChat() {
@@ -511,37 +276,40 @@
                 if (chatClient && typeof chatClient.on === 'function') {
                     chatClient.on('ready', function() {
                         console.log('SDK ready 事件触发');
-                        // 当ready时，优先使用showChatBot方法（因为asstBtn.isNeed为false）
-                        showChatWindow();
-                        // 备用方法
                         forceOpenChat();
                     });
                 }
                 
-                // 监听 DOM 变化，持续尝试打开，并隐藏不需要的元素
+                // 监听 DOM 变化，持续尝试打开，并修复输入框显示
                 var opened = false;
                 var observer = new MutationObserver(function(mutations) {
                     if (!opened) {
                         opened = forceOpenChat();
                     }
                     
-                    // 隐藏"66"等数字标签
+                    // 修复输入框显示：隐藏不需要的文本元素
                     try {
-                        // 查找输入框区域的所有子元素
                         var inputContainers = document.querySelectorAll('[class*="coze"] [class*="input"], [class*="coze"] [class*="Input"], [id*="coze"] [class*="input"], [id*="coze"] [class*="Input"]');
                         inputContainers.forEach(function(container) {
-                            if (container && container.children.length > 0) {
-                                // 检查第一个子元素是否是数字或不需要的元素
-                                var firstChild = container.children[0];
-                                if (firstChild) {
-                                    var text = firstChild.textContent || firstChild.innerText || '';
-                                    // 如果是纯数字（如"66"）或者是空元素，隐藏它
-                                    if (/^\d+$/.test(text.trim()) || text.trim() === '' || firstChild.offsetWidth < 30) {
-                                        firstChild.style.display = 'none';
-                                        firstChild.style.visibility = 'hidden';
-                                        firstChild.style.width = '0';
-                                        firstChild.style.height = '0';
-                                        firstChild.style.opacity = '0';
+                            if (container) {
+                                // 遍历所有子元素
+                                var children = container.children;
+                                for (var i = 0; i < children.length; i++) {
+                                    var child = children[i];
+                                    var text = child.textContent || child.innerText || '';
+                                    var isEditable = child.hasAttribute('contenteditable') || child.tagName === 'INPUT' || child.tagName === 'TEXTAREA';
+                                    
+                                    // 如果不是可编辑元素，且包含奇怪的文本（如"66", "chatin"等），隐藏它
+                                    if (!isEditable && (
+                                        /^\d+$/.test(text.trim()) || // 纯数字
+                                        text.trim().length < 3 || // 很短的文本
+                                        /^[a-z]+$/i.test(text.trim()) && text.trim().length < 6 // 短字母串
+                                    )) {
+                                        child.style.display = 'none';
+                                        child.style.visibility = 'hidden';
+                                        child.style.width = '0';
+                                        child.style.height = '0';
+                                        child.style.opacity = '0';
                                     }
                                 }
                             }
@@ -566,199 +334,17 @@
                     }
                 }, 15000);
                 
-                // 延迟执行一次，确保隐藏"66"等元素
-                setTimeout(function() {
-                    try {
-                        // 隐藏数字标签
-                        var allElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
-                        allElements.forEach(function(el) {
-                            var text = el.textContent || el.innerText || '';
-                            // 如果元素只包含数字（如"66"）且不是输入框本身
-                            if (/^\s*\d+\s*$/.test(text) && el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA' && !el.isContentEditable) {
-                                el.style.display = 'none';
-                                el.style.visibility = 'hidden';
-                                el.style.width = '0';
-                                el.style.height = '0';
-                                el.style.opacity = '0';
-                            }
-                        });
-                        
-                        // 确保所有重要按钮正常显示
-                        var allButtons = document.querySelectorAll('[class*="coze"] button, [id*="coze"] button, [class*="coze"] [role="button"], [id*="coze"] [role="button"]');
-                        allButtons.forEach(function(btn) {
-                            var text = btn.textContent || btn.innerText || '';
-                            var className = btn.className || '';
-                            var ariaLabel = btn.getAttribute('aria-label') || '';
-                            var title = btn.getAttribute('title') || '';
-                            var innerHTML = btn.innerHTML || '';
-                            
-                            // 检查是否是加号、发送、清除等按钮
-                            var isImportantButton = 
-                                className.toLowerCase().indexOf('add') >= 0 ||
-                                className.toLowerCase().indexOf('attach') >= 0 ||
-                                className.toLowerCase().indexOf('send') >= 0 ||
-                                className.toLowerCase().indexOf('submit') >= 0 ||
-                                className.toLowerCase().indexOf('clear') >= 0 ||
-                                className.toLowerCase().indexOf('reset') >= 0 ||
-                                className.toLowerCase().indexOf('new') >= 0 ||
-                                className.toLowerCase().indexOf('delete') >= 0 ||
-                                ariaLabel.toLowerCase().indexOf('添加') >= 0 ||
-                                ariaLabel.toLowerCase().indexOf('附件') >= 0 ||
-                                ariaLabel.toLowerCase().indexOf('发送') >= 0 ||
-                                ariaLabel.toLowerCase().indexOf('清除') >= 0 ||
-                                ariaLabel.toLowerCase().indexOf('重置') >= 0 ||
-                                ariaLabel.toLowerCase().indexOf('新对话') >= 0 ||
-                                title.toLowerCase().indexOf('添加') >= 0 ||
-                                title.toLowerCase().indexOf('附件') >= 0 ||
-                                title.toLowerCase().indexOf('发送') >= 0 ||
-                                title.toLowerCase().indexOf('清除') >= 0 ||
-                                title.toLowerCase().indexOf('重置') >= 0 ||
-                                title.toLowerCase().indexOf('新对话') >= 0 ||
-                                innerHTML.indexOf('+') >= 0 ||
-                                innerHTML.indexOf('✕') >= 0 ||
-                                innerHTML.indexOf('×') >= 0 ||
-                                innerHTML.indexOf('🗑') >= 0 ||
-                                innerHTML.indexOf('📎') >= 0 ||
-                                innerHTML.indexOf('📤') >= 0 ||
-                                innerHTML.indexOf('send') >= 0 ||
-                                innerHTML.indexOf('Send') >= 0;
-                            
-                            if (isImportantButton) {
-                                btn.style.display = 'flex';
-                                btn.style.visibility = 'visible';
-                                btn.style.opacity = '1';
-                                btn.style.width = 'auto';
-                                btn.style.height = 'auto';
-                                btn.style.minWidth = '32px';
-                                btn.style.minHeight = '32px';
-                            }
-                        });
-                        
-                        // 修复输入框布局
-                        var inputContainers = document.querySelectorAll('[class*="coze"] [class*="input"], [class*="coze"] [class*="Input"], [id*="coze"] [class*="input"], [id*="coze"] [class*="Input"]');
-                        inputContainers.forEach(function(container) {
-                            if (container) {
-                                // 确保容器使用flex布局
-                                container.style.display = 'flex';
-                                container.style.flexDirection = 'row';
-                                container.style.alignItems = 'center';
-                                container.style.width = '100%';
-                                container.style.boxSizing = 'border-box';
-                                container.style.gap = '8px';
-                                
-                                // 找到输入框本身
-                                var input = container.querySelector('[contenteditable], input, textarea');
-                                if (input) {
-                                    input.style.flex = '1';
-                                    input.style.minWidth = '0';
-                                    input.style.width = 'auto';
-                                    // 确保输入框可编辑
-                                    if (input.hasAttribute('contenteditable')) {
-                                        input.setAttribute('contenteditable', 'true');
-                                    }
-                                    // 确保输入框未被禁用
-                                    if (input.hasAttribute('disabled')) {
-                                        input.removeAttribute('disabled');
-                                    }
-                                    if (input.hasAttribute('readonly')) {
-                                        input.removeAttribute('readonly');
-                                    }
-                                    // 确保可以接收焦点和输入
-                                    input.style.pointerEvents = 'auto';
-                                    input.style.userSelect = 'text';
-                                    input.style.webkitUserSelect = 'text';
-                                    // 确保有足够的padding显示文字
-                                    if (!input.style.padding || input.style.padding === '0px') {
-                                        input.style.padding = '8px 12px';
-                                    }
-                                }
-                                
-                                // 如果按钮不存在，尝试创建它们
-                                // 检查是否已有清除按钮
-                                var hasClearBtn = container.querySelector('button[class*="clear"], button[class*="reset"], button[aria-label*="清除"], button[title*="清除"], button[aria-label*="Clear"], button[title*="Clear"]');
-                                if (!hasClearBtn && container.parentElement) {
-                                    var clearBtn = document.createElement('button');
-                                    clearBtn.innerHTML = '🗑';
-                                    clearBtn.setAttribute('aria-label', '清除历史记录');
-                                    clearBtn.setAttribute('title', '清除历史记录');
-                                    clearBtn.className = 'coze-clear-btn';
-                                    clearBtn.style.cssText = 'display: flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; margin-right: 8px; flex-shrink: 0;';
-                                    clearBtn.onclick = function() {
-                                        if (window.cozeChatClient) {
-                                            if (typeof window.cozeChatClient.clear === 'function') {
-                                                window.cozeChatClient.clear();
-                                            } else if (typeof window.cozeChatClient.reset === 'function') {
-                                                window.cozeChatClient.reset();
-                                            } else if (typeof window.cozeChatClient.newChat === 'function') {
-                                                window.cozeChatClient.newChat();
-                                            }
-                                        }
-                                    };
-                                    container.insertBefore(clearBtn, container.firstChild);
-                                }
-                                
-                                // 检查是否已有上传按钮
-                                var hasUploadBtn = container.querySelector('button[class*="add"], button[class*="attach"], button[aria-label*="添加"], button[title*="添加"], button[aria-label*="Upload"], button[title*="Upload"]');
-                                if (!hasUploadBtn) {
-                                    var uploadBtn = document.createElement('button');
-                                    uploadBtn.innerHTML = '+';
-                                    uploadBtn.setAttribute('aria-label', '上传文件');
-                                    uploadBtn.setAttribute('title', '上传文件');
-                                    uploadBtn.className = 'coze-upload-btn';
-                                    uploadBtn.style.cssText = 'display: flex !important; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; background: transparent; cursor: pointer; margin-left: 8px; flex-shrink: 0; font-size: 20px;';
-                                    uploadBtn.onclick = function() {
-                                        var fileInput = document.createElement('input');
-                                        fileInput.type = 'file';
-                                        fileInput.style.display = 'none';
-                                        fileInput.onchange = function(e) {
-                                            var file = e.target.files[0];
-                                            if (file && window.cozeChatClient) {
-                                                if (typeof window.cozeChatClient.uploadFile === 'function') {
-                                                    window.cozeChatClient.uploadFile(file);
-                                                } else if (typeof window.cozeChatClient.sendFile === 'function') {
-                                                    window.cozeChatClient.sendFile(file);
-                                                }
-                                            }
-                                        };
-                                        document.body.appendChild(fileInput);
-                                        fileInput.click();
-                                        setTimeout(function() { 
-                                            if (fileInput.parentElement) {
-                                                document.body.removeChild(fileInput);
-                                            }
-                                        }, 100);
-                                    };
-                                    container.appendChild(uploadBtn);
-                                }
-                            }
-                        });
-                    } catch (e) {
-                        console.log('修复布局时出错:', e);
-                    }
-                }, 2000);
-                
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
-                console.error('错误详情:', error.stack);
-                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置。错误信息：' + error.message + '</div>';
+                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置</div>';
             }
         };
 
         // 错误处理
         webSdkScript.onerror = function () {
             console.error('Failed to load Coze Web SDK');
-            document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">SDK加载失败，请检查网络连接或刷新页面重试</div>';
+            document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">加载失败，请刷新页面重试</div>';
         };
-        
-        // 检查SDK是否加载
-        setTimeout(function() {
-            if (typeof CozeWebSDK === 'undefined') {
-                console.error('CozeWebSDK 未定义，SDK可能未加载成功');
-                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">SDK未加载，请检查网络连接</div>';
-            } else {
-                console.log('CozeWebSDK 已加载:', CozeWebSDK);
-            }
-        }, 3000);
     </script>
 </body>
 </html>
