@@ -47,7 +47,7 @@
             background: transparent !important;
             border: none !important;
             outline: none !important;
-            padding: 0 !important;
+            padding: 8px 12px !important;
             margin: 0 !important;
             flex: 1 !important;
             box-sizing: border-box !important;
@@ -58,6 +58,28 @@
             word-wrap: break-word !important;
             overflow-wrap: break-word !important;
             min-width: 0 !important;
+            /* 确保输入框可编辑 */
+            pointer-events: auto !important;
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+        
+        /* 确保contenteditable元素可编辑 */
+        [class*="coze"] [contenteditable="true"],
+        [id*="coze"] [contenteditable="true"],
+        [class*="coze"] [contenteditable=""],
+        [id*="coze"] [contenteditable=""] {
+            contenteditable: true !important;
+            -webkit-user-modify: read-write !important;
+            user-modify: read-write !important;
+        }
+        
+        /* 确保输入框未被禁用 */
+        [class*="coze"] input:not([disabled]),
+        [class*="coze"] textarea:not([disabled]),
+        [id*="coze"] input:not([disabled]),
+        [id*="coze"] textarea:not([disabled]) {
+            pointer-events: auto !important;
         }
         
         /* 修复输入框容器布局 - 确保横向排列 */
@@ -611,6 +633,25 @@
                                     input.style.flex = '1';
                                     input.style.minWidth = '0';
                                     input.style.width = 'auto';
+                                    // 确保输入框可编辑
+                                    if (input.hasAttribute('contenteditable')) {
+                                        input.setAttribute('contenteditable', 'true');
+                                    }
+                                    // 确保输入框未被禁用
+                                    if (input.hasAttribute('disabled')) {
+                                        input.removeAttribute('disabled');
+                                    }
+                                    if (input.hasAttribute('readonly')) {
+                                        input.removeAttribute('readonly');
+                                    }
+                                    // 确保可以接收焦点和输入
+                                    input.style.pointerEvents = 'auto';
+                                    input.style.userSelect = 'text';
+                                    input.style.webkitUserSelect = 'text';
+                                    // 确保有足够的padding显示文字
+                                    if (!input.style.padding || input.style.padding === '0px') {
+                                        input.style.padding = '8px 12px';
+                                    }
                                 }
                                 
                                 // 如果按钮不存在，尝试创建它们
