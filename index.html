@@ -18,12 +18,18 @@
         [class*="coze"] [class*="chat"],
         [class*="coze"] [class*="window"],
         [class*="coze"] [class*="panel"],
+        [class*="coze"] [class*="chatbot"],
+        [class*="coze"] [class*="ChatBot"],
         [id*="coze"] [class*="chat"],
-        [id*="coze"] [class*="window"] {
+        [id*="coze"] [class*="window"],
+        [id*="coze"] [class*="chatbot"],
+        [id*="coze"] [class*="ChatBot"] {
             display: block !important;
             visibility: visible !important;
             opacity: 1 !important;
             z-index: 9999 !important;
+            width: 100% !important;
+            height: 100% !important;
         }
         
         /* 隐藏悬浮按钮 */
@@ -358,6 +364,7 @@
                     "componentProps": {
                         "defaultOpen": true
                     },
+                    // 不指定container，让SDK自动创建
                     // UI配置 - 使用SDK默认样式，确保输入框显示正确
                     "ui": {
                         "base": {
