@@ -231,8 +231,8 @@
                     });
                 }
                 
-                // 多次尝试打开（防止 ready 事件未触发或延迟）
-                console.log('🔄 设置定时器，将在1秒后尝试打开对话框');
+                // 多次尝试打开（防止 ready 事件未触发或延迟，增加更多尝试）
+                console.log('🔄 设置定时器，将在不同时间点尝试打开对话框');
                 setTimeout(function() {
                     console.log('🔄 1秒后尝试打开对话框');
                     autoOpenDialog();
@@ -257,6 +257,16 @@
                     console.log('🔄 5秒后尝试打开对话框');
                     autoOpenDialog();
                 }, 5000);
+                
+                setTimeout(function() {
+                    console.log('🔄 6秒后尝试打开对话框');
+                    autoOpenDialog();
+                }, 6000);
+                
+                setTimeout(function() {
+                    console.log('🔄 8秒后尝试打开对话框');
+                    autoOpenDialog();
+                }, 8000);
                 
                 // 自定义UI：修改占位符文本和隐藏横幅
                 function customizeUI() {
