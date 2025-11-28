@@ -187,21 +187,90 @@
                 setTimeout(autoOpenDialog, 2000);
                 setTimeout(autoOpenDialog, 3000);
                 
-                // 使用 DOM 观察器检测悬浮按钮出现后自动点击
+                // 修改输入框占位符和隐藏横幅的函数
+                function customizeUI() {
+                    try {
+                        // 1. 修改输入框占位符文本
+                        var placeholders = document.querySelectorAll('[placeholder*="chatInputPlaceholder"], [placeholder*="ChatInputPlaceholder"], [placeholder*="chat"], [placeholder*="Chat"]');
+                        placeholders.forEach(function(input) {
+                            if (input.placeholder && input.placeholder.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
+                                input.placeholder = '请输入主题或链接';
+                                console.log('已修改输入框占位符');
+                            }
+                        });
+                        
+                        // 查找所有可能的输入框元素（包括 contenteditable）
+                        var allInputs = document.querySelectorAll('input[type="text"], textarea, [contenteditable="true"], [contenteditable]');
+                        allInputs.forEach(function(input) {
+                            // 检查是否有占位符属性
+                            if (input.placeholder && input.placeholder.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
+                                input.placeholder = '请输入主题或链接';
+                            }
+                            // 检查是否有 data-placeholder 属性
+                            if (input.getAttribute('data-placeholder') && 
+                                input.getAttribute('data-placeholder').toLowerCase().indexOf('chatinputplaceholder') >= 0) {
+                                input.setAttribute('data-placeholder', '请输入主题或链接');
+                            }
+                        });
+                        
+                        // 查找包含占位符文本的 div 元素（某些 SDK 可能使用 div 作为占位符）
+                        var allElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
+                        allElements.forEach(function(el) {
+                            var text = (el.textContent || el.innerText || '').trim();
+                            // 如果是占位符文本，替换它
+                            if (text.toLowerCase() === 'chatinputplaceholder' || 
+                                text.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
+                                // 检查是否是占位符元素（通常是空的或只有占位符文本）
+                                if (el.children.length === 0 || (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
+                                    el.textContent = '请输入主题或链接';
+                                    console.log('已修改占位符文本元素');
+                                }
+                            }
+                        });
+                        
+                        // 2. 隐藏 web_sdk_official_banner 文本
+                        var bannerElements = document.querySelectorAll('*');
+                        bannerElements.forEach(function(el) {
+                            var text = (el.textContent || el.innerText || '').trim();
+                            // 查找包含 web_sdk_official_banner 的元素
+                            if (text.toLowerCase().indexOf('web_sdk_official_banner') >= 0 || 
+                                text === 'web_sdk_official_banner') {
+                                el.style.display = 'none';
+                                el.style.visibility = 'hidden';
+                                el.style.opacity = '0';
+                                el.style.height = '0';
+                                el.style.width = '0';
+                                el.style.overflow = 'hidden';
+                                console.log('已隐藏 web_sdk_official_banner');
+                            }
+                        });
+                    } catch (e) {
+                        console.log('自定义UI时出错:', e);
+                    }
+                }
+                
+                // 使用 DOM 观察器检测悬浮按钮出现后自动点击，并修改UI
                 var observer = new MutationObserver(function(mutations) {
                     autoOpenDialog();
+                    customizeUI(); // 每次DOM变化时都尝试修改UI
                 });
                 
                 observer.observe(document.body, {
                     childList: true,
                     subtree: true,
                     attributes: true,
-                    attributeFilter: ['class', 'style']
+                    attributeFilter: ['class', 'style', 'placeholder']
                 });
                 
-                // 10秒后停止观察
+                // 定期执行UI自定义（确保能捕获到动态生成的元素）
+                var customizeInterval = setInterval(function() {
+                    customizeUI();
+                }, 500);
+                
+                // 10秒后停止观察和定时器
                 setTimeout(function() {
                     observer.disconnect();
+                    clearInterval(customizeInterval);
                 }, 10000);
                 
             } catch (error) {
