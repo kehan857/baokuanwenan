@@ -125,50 +125,96 @@
                 // 自动打开对话框的函数
                 function autoOpenDialog() {
                     try {
-                        // 方法1: 尝试调用 open 方法
-                        if (chatClient && typeof chatClient.open === 'function') {
-                            chatClient.open();
-                            console.log('已调用 open() 方法');
+                        // 方法1: 优先尝试调用 open 方法（最可靠）
+                        if (chatClient) {
+                            // 检查是否有 open 方法
+                            if (typeof chatClient.open === 'function') {
+                                chatClient.open();
+                                console.log('✅ 已调用 chatClient.open() 方法');
+                                return true;
+                            }
+                            // 检查是否有 show 方法
+                            if (typeof chatClient.show === 'function') {
+                                chatClient.show();
+                                console.log('✅ 已调用 chatClient.show() 方法');
+                                return true;
+                            }
+                            // 检查是否有 toggle 方法
+                            if (typeof chatClient.toggle === 'function') {
+                                chatClient.toggle();
+                                console.log('✅ 已调用 chatClient.toggle() 方法');
+                                return true;
+                            }
+                        }
+                        
+                        // 方法2: 查找所有固定定位的元素，找到最可能是悬浮按钮的
+                        var allFixedElements = document.querySelectorAll('*');
+                        var candidateButtons = [];
+                        
+                        for (var i = 0; i < allFixedElements.length; i++) {
+                            var elem = allFixedElements[i];
+                            var style = window.getComputedStyle(elem);
+                            var rect = elem.getBoundingClientRect();
+                            
+                            // 检查是否是固定定位且在右下角
+                            if (style.position === 'fixed' && 
+                                rect.width > 0 && rect.height > 0 &&
+                                rect.right > window.innerWidth - 200 && 
+                                rect.bottom > window.innerHeight - 200) {
+                                
+                                // 计算距离右下角的距离，越小越可能是悬浮按钮
+                                var distanceFromRight = window.innerWidth - rect.right;
+                                var distanceFromBottom = window.innerHeight - rect.bottom;
+                                var totalDistance = distanceFromRight + distanceFromBottom;
+                                
+                                // 如果是圆形或接近正方形，且尺寸合适，很可能是悬浮按钮
+                                if (rect.width > 30 && rect.width < 150 && 
+                                    rect.height > 30 && rect.height < 150 &&
+                                    Math.abs(rect.width - rect.height) < 20) {
+                                    candidateButtons.push({
+                                        element: elem,
+                                        distance: totalDistance,
+                                        rect: rect
+                                    });
+                                }
+                            }
+                        }
+                        
+                        // 按距离排序，点击最接近右下角的
+                        candidateButtons.sort(function(a, b) {
+                            return a.distance - b.distance;
+                        });
+                        
+                        if (candidateButtons.length > 0) {
+                            var targetBtn = candidateButtons[0].element;
+                            console.log('🔍 找到悬浮按钮，位置:', candidateButtons[0].rect);
+                            targetBtn.click();
+                            console.log('✅ 已点击悬浮按钮');
                             return true;
                         }
                         
-                        // 方法2: 查找并点击悬浮按钮
-                        var buttons = document.querySelectorAll('button, div[role="button"], [class*="button"], [class*="btn"], [style*="position: fixed"]');
-                        for (var i = 0; i < buttons.length; i++) {
-                            var btn = buttons[i];
-                            var style = window.getComputedStyle(btn);
-                            var rect = btn.getBoundingClientRect();
+                        // 方法3: 查找包含 Coze 相关类名的按钮
+                        var cozeButtons = document.querySelectorAll('[class*="coze"] button, [class*="coze"] [role="button"], [id*="coze"] button, [id*="coze"] [role="button"]');
+                        for (var j = 0; j < cozeButtons.length; j++) {
+                            var btn = cozeButtons[j];
+                            var btnStyle = window.getComputedStyle(btn);
+                            var btnRect = btn.getBoundingClientRect();
                             
-                            // 检查是否是右下角的悬浮按钮（固定定位，在右下角区域）
-                            if (style.position === 'fixed' && 
-                                rect.right > window.innerWidth - 100 && 
-                                rect.bottom > window.innerHeight - 100 &&
-                                rect.width > 40 && rect.width < 100 &&
-                                rect.height > 40 && rect.height < 100) {
+                            if (btnStyle.position === 'fixed' && btnRect.width > 0 && btnRect.height > 0) {
+                                console.log('🔍 找到 Coze 按钮，位置:', btnRect);
                                 btn.click();
-                                console.log('已点击悬浮按钮');
+                                console.log('✅ 已点击 Coze 按钮');
                                 return true;
                             }
                         }
                         
-                        // 方法3: 查找包含 Coze logo 的元素并点击
-                        var cozeElements = document.querySelectorAll('[class*="coze"], [id*="coze"]');
-                        for (var j = 0; j < cozeElements.length; j++) {
-                            var elem = cozeElements[j];
-                            var elemStyle = window.getComputedStyle(elem);
-                            var elemRect = elem.getBoundingClientRect();
-                            
-                            // 如果是固定定位且在右下角，尝试点击
-                            if (elemStyle.position === 'fixed' && 
-                                elemRect.right > window.innerWidth - 150 && 
-                                elemRect.bottom > window.innerHeight - 150) {
-                                elem.click();
-                                console.log('已点击 Coze 元素');
-                                return true;
-                            }
-                        }
+                        console.log('⚠️ 未找到悬浮按钮，chatClient 方法:', {
+                            hasOpen: typeof chatClient?.open === 'function',
+                            hasShow: typeof chatClient?.show === 'function',
+                            hasToggle: typeof chatClient?.toggle === 'function'
+                        });
                     } catch (e) {
-                        console.error('自动打开对话框时出错:', e);
+                        console.error('❌ 自动打开对话框时出错:', e);
                     }
                     return false;
                 }
@@ -176,18 +222,41 @@
                 // 监听 ready 事件
                 if (chatClient && typeof chatClient.on === 'function') {
                     chatClient.on('ready', function() {
-                        console.log('SDK ready 事件触发');
-                        // 延迟后尝试打开
-                        setTimeout(autoOpenDialog, 500);
+                        console.log('🎉 SDK ready 事件触发');
+                        // 延迟后尝试打开，给SDK更多时间初始化
+                        setTimeout(function() {
+                            console.log('🔄 ready 事件后尝试打开对话框');
+                            autoOpenDialog();
+                        }, 800);
                     });
                 }
                 
-                // 多次尝试打开（防止 ready 事件未触发）
-                setTimeout(autoOpenDialog, 1000);
-                setTimeout(autoOpenDialog, 2000);
-                setTimeout(autoOpenDialog, 3000);
-                setTimeout(autoOpenDialog, 4000);
-                setTimeout(autoOpenDialog, 5000);
+                // 多次尝试打开（防止 ready 事件未触发或延迟）
+                console.log('🔄 设置定时器，将在1秒后尝试打开对话框');
+                setTimeout(function() {
+                    console.log('🔄 1秒后尝试打开对话框');
+                    autoOpenDialog();
+                }, 1000);
+                
+                setTimeout(function() {
+                    console.log('🔄 2秒后尝试打开对话框');
+                    autoOpenDialog();
+                }, 2000);
+                
+                setTimeout(function() {
+                    console.log('🔄 3秒后尝试打开对话框');
+                    autoOpenDialog();
+                }, 3000);
+                
+                setTimeout(function() {
+                    console.log('🔄 4秒后尝试打开对话框');
+                    autoOpenDialog();
+                }, 4000);
+                
+                setTimeout(function() {
+                    console.log('🔄 5秒后尝试打开对话框');
+                    autoOpenDialog();
+                }, 5000);
                 
                 // 自定义UI：修改占位符文本和隐藏横幅
                 function customizeUI() {
