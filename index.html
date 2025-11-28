@@ -5,119 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>爆款文案生成 - AI智能助手</title>
     <style>
-        /* 确保页面全屏显示聊天界面 */
+        /* 基本页面样式，不干扰Coze原生样式 */
         body {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100vh;
-            overflow: hidden;
-        }
-        
-        /* 强制显示 Coze 聊天窗口 */
-        [class*="coze"] [class*="chat"],
-        [class*="coze"] [class*="window"],
-        [class*="coze"] [class*="panel"],
-        [id*="coze"] [class*="chat"],
-        [id*="coze"] [class*="window"] {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            z-index: 9999 !important;
-        }
-        
-        /* 隐藏悬浮按钮 */
-        [class*="coze"] [class*="button"][style*="position: fixed"],
-        [class*="asst"][style*="position: fixed"],
-        [id*="coze"][style*="position: fixed"] {
-            display: none !important;
-        }
-        
-        /* 修复输入框显示 - 确保输入框容器正常显示 */
-        [class*="coze"] [class*="input"],
-        [class*="coze"] [class*="Input"],
-        [id*="coze"] [class*="input"],
-        [id*="coze"] [class*="Input"] {
-            display: flex !important;
-            align-items: center !important;
-            width: 100% !important;
-            min-height: 44px !important;
-            box-sizing: border-box !important;
-        }
-        
-        /* 确保输入框本身正常显示 */
-        [class*="coze"] [contenteditable="true"],
-        [class*="coze"] [contenteditable],
-        [class*="coze"] textarea,
-        [class*="coze"] input[type="text"],
-        [id*="coze"] [contenteditable="true"],
-        [id*="coze"] [contenteditable],
-        [id*="coze"] textarea,
-        [id*="coze"] input[type="text"] {
-            flex: 1 !important;
-            min-width: 0 !important;
-            min-height: 36px !important;
-            padding: 8px 12px !important;
-            border: none !important;
-            outline: none !important;
-            font-size: 14px !important;
-            line-height: 1.5 !important;
-            background: transparent !important;
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        /* 确保输入框容器中的按钮正常显示 */
-        [class*="coze"] [class*="input"] button,
-        [class*="coze"] [class*="Input"] button,
-        [id*="coze"] [class*="input"] button,
-        [id*="coze"] [class*="Input"] button {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            flex-shrink: 0 !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        /* 确保输入框底部区域正常显示 */
-        [class*="coze"] [class*="footer"],
-        [class*="coze"] [class*="Footer"],
-        [id*="coze"] [class*="footer"],
-        [id*="coze"] [class*="Footer"] {
-            display: flex !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-        }
-        
-        /* 隐藏文件输入框 */
-        [class*="coze"] input[type="file"],
-        [id*="coze"] input[type="file"] {
-            display: none !important;
-            visibility: hidden !important;
-            position: absolute !important;
-            left: -9999px !important;
-            opacity: 0 !important;
-            width: 0 !important;
-            height: 0 !important;
-        }
-        
-        /* 确保输入框布局正确 - 只显示输入框和发送按钮 */
-        [class*="coze"] [class*="input"],
-        [class*="coze"] [class*="Input"],
-        [id*="coze"] [class*="input"],
-        [id*="coze"] [class*="Input"] {
-            flex-direction: row !important;
-            align-items: center !important;
-            gap: 8px !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 
+                         'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
         }
     </style>
 </head>
 <body>
-    <!-- 创建容器用于嵌入聊天窗口 -->
-    <div id="coze-chat-container" style="width: 100%; height: 100vh; position: fixed; top: 0; left: 0; z-index: 9999;"></div>
-    
     <script type="text/javascript">
         var webSdkScript = document.createElement('script');
         webSdkScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
@@ -178,15 +75,10 @@
             }
             
             // 生成新的会话ID，每次刷新页面时都会生成新的
-            // 使用时间戳 + 随机数 + URL参数确保唯一性
             function generateSessionId() {
                 const timestamp = Date.now();
                 const random1 = Math.random().toString(36).substr(2, 9);
                 const random2 = Math.random().toString(36).substr(2, 9);
-                const urlParam = Math.random().toString(36).substr(2, 9);
-                // 添加URL参数，确保每次访问都是新的
-                const newUrl = window.location.pathname + '?t=' + timestamp + '&r=' + urlParam;
-                window.history.replaceState({}, '', newUrl);
                 return 'session_' + timestamp + '_' + random1 + '_' + random2;
             }
             
@@ -198,6 +90,7 @@
                 // 生成唯一的用户ID（每次访问都不同，确保新会话）
                 const uniqueUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
                 
+                // 使用默认的悬浮按钮模式，不指定container
                 const chatClient = new CozeWebSDK.WebChatClient({
                     "config": {
                         "type": "app",
@@ -222,216 +115,81 @@
                     "userInfo": {
                         "id": uniqueUserId,
                         "nickname": "访客"
-                    },
-                    // 指定容器，直接嵌入到页面中
-                    "container": document.getElementById('coze-chat-container'),
-                    // 组件属性：自动展开聊天窗口（关键配置）
-                    "componentProps": {
-                        "defaultOpen": true
                     }
+                    // 不指定container，使用默认的悬浮按钮模式
                 });
                 
                 // 全局保存 chatClient 引用，方便调试
                 window.cozeChatClient = chatClient;
                 
-                // 多种方式确保自动展开
-                function forceOpenChat() {
+                // 自动打开对话框的函数
+                function autoOpenDialog() {
                     try {
-                        // 方法1: 直接调用 open 方法
+                        // 方法1: 尝试调用 open 方法
                         if (chatClient && typeof chatClient.open === 'function') {
                             chatClient.open();
-                            console.log('尝试调用 open() 方法');
+                            console.log('已调用 open() 方法');
                             return true;
                         }
                         
-                        // 方法2: 尝试调用 show 方法
-                        if (chatClient && typeof chatClient.show === 'function') {
-                            chatClient.show();
-                            console.log('尝试调用 show() 方法');
-                            return true;
-                        }
-                        
-                        // 方法3: 查找所有可能的按钮并点击
-                        var allButtons = document.querySelectorAll('button, div[role="button"], [class*="button"], [class*="btn"]');
-                        for (var i = 0; i < allButtons.length; i++) {
-                            var btn = allButtons[i];
-                            var text = btn.textContent || btn.innerText || '';
-                            var className = btn.className || '';
-                            // 查找包含 coze、chat、asst 等关键词的按钮
-                            if (className.toLowerCase().indexOf('coze') >= 0 || 
-                                className.toLowerCase().indexOf('chat') >= 0 ||
-                                className.toLowerCase().indexOf('asst') >= 0 ||
-                                text.toLowerCase().indexOf('chat') >= 0) {
+                        // 方法2: 查找并点击悬浮按钮
+                        var buttons = document.querySelectorAll('button, div[role="button"], [class*="button"], [class*="btn"], [style*="position: fixed"]');
+                        for (var i = 0; i < buttons.length; i++) {
+                            var btn = buttons[i];
+                            var style = window.getComputedStyle(btn);
+                            var rect = btn.getBoundingClientRect();
+                            
+                            // 检查是否是右下角的悬浮按钮（固定定位，在右下角区域）
+                            if (style.position === 'fixed' && 
+                                rect.right > window.innerWidth - 100 && 
+                                rect.bottom > window.innerHeight - 100 &&
+                                rect.width > 40 && rect.width < 100 &&
+                                rect.height > 40 && rect.height < 100) {
                                 btn.click();
-                                console.log('点击了按钮:', className);
+                                console.log('已点击悬浮按钮');
                                 return true;
                             }
                         }
                         
-                        // 方法4: 查找固定定位的元素（通常是悬浮按钮）
-                        var fixedElements = document.querySelectorAll('[style*="position: fixed"], [style*="position:fixed"]');
-                        for (var j = 0; j < fixedElements.length; j++) {
-                            var elem = fixedElements[j];
-                            if (elem.offsetWidth > 0 && elem.offsetHeight > 0) {
+                        // 方法3: 查找包含 Coze logo 的元素并点击
+                        var cozeElements = document.querySelectorAll('[class*="coze"], [id*="coze"]');
+                        for (var j = 0; j < cozeElements.length; j++) {
+                            var elem = cozeElements[j];
+                            var elemStyle = window.getComputedStyle(elem);
+                            var elemRect = elem.getBoundingClientRect();
+                            
+                            // 如果是固定定位且在右下角，尝试点击
+                            if (elemStyle.position === 'fixed' && 
+                                elemRect.right > window.innerWidth - 150 && 
+                                elemRect.bottom > window.innerHeight - 150) {
                                 elem.click();
-                                console.log('点击了固定定位元素');
+                                console.log('已点击 Coze 元素');
                                 return true;
                             }
                         }
                     } catch (e) {
-                        console.error('强制打开聊天窗口错误:', e);
+                        console.error('自动打开对话框时出错:', e);
                     }
                     return false;
                 }
-                
-                // 立即尝试打开（更频繁的尝试）
-                setTimeout(forceOpenChat, 50);
-                setTimeout(forceOpenChat, 100);
-                setTimeout(forceOpenChat, 200);
-                setTimeout(forceOpenChat, 300);
-                setTimeout(forceOpenChat, 500);
-                setTimeout(forceOpenChat, 800);
-                setTimeout(forceOpenChat, 1000);
-                setTimeout(forceOpenChat, 1500);
-                setTimeout(forceOpenChat, 2000);
-                setTimeout(forceOpenChat, 3000);
-                setTimeout(forceOpenChat, 5000);
                 
                 // 监听 ready 事件
                 if (chatClient && typeof chatClient.on === 'function') {
                     chatClient.on('ready', function() {
                         console.log('SDK ready 事件触发');
-                        forceOpenChat();
+                        // 延迟后尝试打开
+                        setTimeout(autoOpenDialog, 500);
                     });
                 }
                 
-                // 监听 DOM 变化，持续尝试打开，并修复输入框显示
-                var opened = false;
+                // 多次尝试打开（防止 ready 事件未触发）
+                setTimeout(autoOpenDialog, 1000);
+                setTimeout(autoOpenDialog, 2000);
+                setTimeout(autoOpenDialog, 3000);
+                
+                // 使用 DOM 观察器检测悬浮按钮出现后自动点击
                 var observer = new MutationObserver(function(mutations) {
-                    if (!opened) {
-                        opened = forceOpenChat();
-                    }
-                    
-                    // 修复输入框显示：确保输入框正常显示，隐藏不需要的元素
-                    try {
-                        // 隐藏"66"等数字文本
-                        var allElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
-                        allElements.forEach(function(el) {
-                            if (el && el.children.length === 0) { // 只处理叶子节点
-                                var text = (el.textContent || el.innerText || '').trim();
-                                // 如果是纯数字（如"66"）且不是输入框，隐藏它
-                                if (/^\d+$/.test(text) && text.length <= 3 && 
-                                    !el.hasAttribute('contenteditable') && 
-                                    el.tagName !== 'INPUT' && 
-                                    el.tagName !== 'TEXTAREA') {
-                                    el.style.display = 'none';
-                                    el.style.visibility = 'hidden';
-                                    el.style.width = '0';
-                                    el.style.height = '0';
-                                    el.style.opacity = '0';
-                                }
-                            }
-                        });
-                        
-                        // 隐藏"选择文件"按钮和文本
-                        var fileButtons = document.querySelectorAll('[class*="coze"] button, [id*="coze"] button');
-                        fileButtons.forEach(function(btn) {
-                            var text = (btn.textContent || btn.innerText || '').trim();
-                            var title = btn.getAttribute('title') || '';
-                            var ariaLabel = btn.getAttribute('aria-label') || '';
-                            if (text.indexOf('选择文件') >= 0 || 
-                                title.indexOf('选择文件') >= 0 || 
-                                ariaLabel.indexOf('选择文件') >= 0) {
-                                btn.style.display = 'none';
-                                btn.style.visibility = 'hidden';
-                            }
-                        });
-                        
-                        // 隐藏"未选择任何文件"文本
-                        var allTextElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
-                        allTextElements.forEach(function(el) {
-                            if (el && el.children.length === 0) {
-                                var text = (el.textContent || el.innerText || '').trim();
-                                if (text.indexOf('未选择任何文件') >= 0) {
-                                    el.style.display = 'none';
-                                    el.style.visibility = 'hidden';
-                                }
-                            }
-                        });
-                        
-                        // 隐藏文件输入框
-                        var fileInputs = document.querySelectorAll('[class*="coze"] input[type="file"], [id*="coze"] input[type="file"]');
-                        fileInputs.forEach(function(input) {
-                            input.style.display = 'none';
-                            input.style.visibility = 'hidden';
-                            input.style.position = 'absolute';
-                            input.style.left = '-9999px';
-                            input.style.opacity = '0';
-                            input.style.width = '0';
-                            input.style.height = '0';
-                        });
-                        
-                        // 确保输入框容器可见且布局正确
-                        var inputContainers = document.querySelectorAll('[class*="coze"] [class*="input"], [class*="coze"] [class*="Input"], [id*="coze"] [class*="input"], [id*="coze"] [class*="Input"]');
-                        inputContainers.forEach(function(container) {
-                            if (container) {
-                                container.style.display = 'flex';
-                                container.style.flexDirection = 'row';
-                                container.style.alignItems = 'center';
-                                container.style.visibility = 'visible';
-                                container.style.opacity = '1';
-                                container.style.minHeight = '44px';
-                                container.style.gap = '8px';
-                                
-                                // 确保输入框本身可见
-                                var inputs = container.querySelectorAll('[contenteditable], [contenteditable="true"], textarea, input[type="text"]');
-                                inputs.forEach(function(input) {
-                                    input.style.display = 'block';
-                                    input.style.visibility = 'visible';
-                                    input.style.opacity = '1';
-                                    input.style.minHeight = '36px';
-                                    input.style.padding = '8px 12px';
-                                    input.style.flex = '1';
-                                });
-                                
-                                // 只显示发送按钮，隐藏其他按钮（如文件上传按钮）
-                                var buttons = container.querySelectorAll('button');
-                                buttons.forEach(function(btn) {
-                                    var text = (btn.textContent || btn.innerText || '').trim();
-                                    var title = btn.getAttribute('title') || '';
-                                    var ariaLabel = btn.getAttribute('aria-label') || '';
-                                    var innerHTML = btn.innerHTML || '';
-                                    
-                                    // 如果是发送按钮（包含发送图标或文字），显示
-                                    if (text.indexOf('发送') >= 0 || 
-                                        title.indexOf('发送') >= 0 || 
-                                        ariaLabel.indexOf('发送') >= 0 ||
-                                        innerHTML.indexOf('send') >= 0 ||
-                                        innerHTML.indexOf('Send') >= 0 ||
-                                        innerHTML.indexOf('paper') >= 0 ||
-                                        innerHTML.indexOf('arrow') >= 0) {
-                                        btn.style.display = 'flex';
-                                        btn.style.visibility = 'visible';
-                                        btn.style.opacity = '1';
-                                    } else {
-                                        // 其他按钮（如文件上传）隐藏
-                                        btn.style.display = 'none';
-                                        btn.style.visibility = 'hidden';
-                                    }
-                                });
-                            }
-                        });
-                        
-                        // 确保底部输入区域可见
-                        var footers = document.querySelectorAll('[class*="coze"] [class*="footer"], [class*="coze"] [class*="Footer"], [id*="coze"] [class*="footer"], [id*="coze"] [class*="Footer"]');
-                        footers.forEach(function(footer) {
-                            footer.style.display = 'flex';
-                            footer.style.visibility = 'visible';
-                            footer.style.opacity = '1';
-                        });
-                    } catch (e) {
-                        console.log('修复输入框显示时出错:', e);
-                    }
+                    autoOpenDialog();
                 });
                 
                 observer.observe(document.body, {
@@ -441,13 +199,10 @@
                     attributeFilter: ['class', 'style']
                 });
                 
-                // 15秒后停止监听
+                // 10秒后停止观察
                 setTimeout(function() {
                     observer.disconnect();
-                    if (!opened) {
-                        console.warn('15秒内未能自动打开聊天窗口，请手动点击');
-                    }
-                }, 15000);
+                }, 10000);
                 
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
@@ -463,4 +218,3 @@
     </script>
 </body>
 </html>
-
