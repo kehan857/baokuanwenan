@@ -127,6 +127,12 @@
                     try {
                         // 方法1: 优先尝试调用 open 方法（最可靠）
                         if (chatClient) {
+                            // 打印 chatClient 的所有方法，用于调试
+                            try {
+                                var methods = Object.getOwnPropertyNames(Object.getPrototypeOf(chatClient));
+                                console.log('🔍 chatClient 可用方法:', methods);
+                            } catch (e) {}
+                            
                             // 检查是否有 open 方法
                             if (typeof chatClient.open === 'function') {
                                 chatClient.open();
@@ -147,35 +153,46 @@
                             }
                         }
                         
-                        // 方法2: 查找所有固定定位的元素，找到最可能是悬浮按钮的
-                        var allFixedElements = document.querySelectorAll('*');
+                        // 方法2: 查找所有可能的按钮和可点击元素（放宽条件）
+                        var allClickableElements = document.querySelectorAll('button, [role="button"], [onclick], [class*="button"], [class*="btn"], [class*="assistant"], [class*="chat"], [class*="coze"]');
+                        console.log('🔍 找到可点击元素数量:', allClickableElements.length);
+                        
                         var candidateButtons = [];
                         
-                        for (var i = 0; i < allFixedElements.length; i++) {
-                            var elem = allFixedElements[i];
+                        for (var i = 0; i < allClickableElements.length; i++) {
+                            var elem = allClickableElements[i];
                             var style = window.getComputedStyle(elem);
                             var rect = elem.getBoundingClientRect();
                             
-                            // 检查是否是固定定位且在右下角
-                            if (style.position === 'fixed' && 
-                                rect.width > 0 && rect.height > 0 &&
-                                rect.right > window.innerWidth - 200 && 
-                                rect.bottom > window.innerHeight - 200) {
+                            // 检查是否可见且在右下角区域
+                            if (style.display !== 'none' && 
+                                style.visibility !== 'hidden' &&
+                                style.opacity !== '0' &&
+                                rect.width > 0 && rect.height > 0) {
                                 
-                                // 计算距离右下角的距离，越小越可能是悬浮按钮
-                                var distanceFromRight = window.innerWidth - rect.right;
-                                var distanceFromBottom = window.innerHeight - rect.bottom;
-                                var totalDistance = distanceFromRight + distanceFromBottom;
+                                // 检查是否在右下角（放宽条件）
+                                var isInBottomRight = (rect.right > window.innerWidth - 300 && 
+                                                      rect.bottom > window.innerHeight - 300);
                                 
-                                // 如果是圆形或接近正方形，且尺寸合适，很可能是悬浮按钮
-                                if (rect.width > 30 && rect.width < 150 && 
-                                    rect.height > 30 && rect.height < 150 &&
-                                    Math.abs(rect.width - rect.height) < 20) {
-                                    candidateButtons.push({
-                                        element: elem,
-                                        distance: totalDistance,
-                                        rect: rect
-                                    });
+                                // 检查是否是固定定位
+                                var isFixed = style.position === 'fixed';
+                                
+                                if (isFixed || isInBottomRight) {
+                                    var distanceFromRight = window.innerWidth - rect.right;
+                                    var distanceFromBottom = window.innerHeight - rect.bottom;
+                                    var totalDistance = distanceFromRight + distanceFromBottom;
+                                    
+                                    // 放宽尺寸限制
+                                    if (rect.width > 20 && rect.width < 200 && 
+                                        rect.height > 20 && rect.height < 200) {
+                                        candidateButtons.push({
+                                            element: elem,
+                                            distance: totalDistance,
+                                            rect: rect,
+                                            className: elem.className,
+                                            tagName: elem.tagName
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -185,33 +202,61 @@
                             return a.distance - b.distance;
                         });
                         
+                        console.log('🔍 候选按钮数量:', candidateButtons.length);
+                        if (candidateButtons.length > 0) {
+                            console.log('🔍 前3个候选按钮:', candidateButtons.slice(0, 3).map(function(b) {
+                                return {
+                                    tag: b.tagName,
+                                    class: b.className,
+                                    distance: b.distance,
+                                    rect: b.rect
+                                };
+                            }));
+                        }
+                        
                         if (candidateButtons.length > 0) {
                             var targetBtn = candidateButtons[0].element;
-                            console.log('🔍 找到悬浮按钮，位置:', candidateButtons[0].rect);
+                            console.log('🔍 找到悬浮按钮，位置:', candidateButtons[0].rect, '类名:', candidateButtons[0].className);
                             targetBtn.click();
                             console.log('✅ 已点击悬浮按钮');
                             return true;
                         }
                         
-                        // 方法3: 查找包含 Coze 相关类名的按钮
-                        var cozeButtons = document.querySelectorAll('[class*="coze"] button, [class*="coze"] [role="button"], [id*="coze"] button, [id*="coze"] [role="button"]');
-                        for (var j = 0; j < cozeButtons.length; j++) {
-                            var btn = cozeButtons[j];
-                            var btnStyle = window.getComputedStyle(btn);
-                            var btnRect = btn.getBoundingClientRect();
+                        // 方法3: 查找所有固定定位的元素
+                        var allFixedElements = document.querySelectorAll('*');
+                        var fixedCandidates = [];
+                        
+                        for (var j = 0; j < allFixedElements.length; j++) {
+                            var fixedElem = allFixedElements[j];
+                            var fixedStyle = window.getComputedStyle(fixedElem);
+                            var fixedRect = fixedElem.getBoundingClientRect();
                             
-                            if (btnStyle.position === 'fixed' && btnRect.width > 0 && btnRect.height > 0) {
-                                console.log('🔍 找到 Coze 按钮，位置:', btnRect);
-                                btn.click();
-                                console.log('✅ 已点击 Coze 按钮');
-                                return true;
+                            if (fixedStyle.position === 'fixed' && 
+                                fixedRect.width > 0 && fixedRect.height > 0 &&
+                                fixedRect.right > window.innerWidth - 300 && 
+                                fixedRect.bottom > window.innerHeight - 300) {
+                                fixedCandidates.push({
+                                    element: fixedElem,
+                                    rect: fixedRect,
+                                    className: fixedElem.className
+                                });
                             }
                         }
                         
-                        console.log('⚠️ 未找到悬浮按钮，chatClient 方法:', {
-                            hasOpen: typeof chatClient?.open === 'function',
-                            hasShow: typeof chatClient?.show === 'function',
-                            hasToggle: typeof chatClient?.toggle === 'function'
+                        if (fixedCandidates.length > 0) {
+                            console.log('🔍 找到固定定位元素:', fixedCandidates.length, '个');
+                            // 点击第一个
+                            fixedCandidates[0].element.click();
+                            console.log('✅ 已点击固定定位元素');
+                            return true;
+                        }
+                        
+                        console.log('⚠️ 未找到悬浮按钮');
+                        console.log('🔍 调试信息:', {
+                            chatClientMethods: chatClient ? Object.getOwnPropertyNames(Object.getPrototypeOf(chatClient)) : 'chatClient is null',
+                            allClickableCount: allClickableElements.length,
+                            candidateCount: candidateButtons.length,
+                            fixedCount: fixedCandidates.length
                         });
                     } catch (e) {
                         console.error('❌ 自动打开对话框时出错:', e);
