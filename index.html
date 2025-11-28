@@ -16,6 +16,50 @@
 </head>
 <body>
     <script type="text/javascript">
+        // 抑制 Coze SDK 内部的 ErrorBoundary 警告（不影响功能）
+        (function() {
+            // 检查消息是否包含 ErrorBoundary 警告
+            function shouldFilterMessage(args) {
+                var message = '';
+                for (var i = 0; i < args.length; i++) {
+                    if (typeof args[i] === 'string') {
+                        message += args[i] + ' ';
+                    } else if (args[i] && typeof args[i] === 'object') {
+                        // 检查对象中的 message 属性
+                        if (args[i].message) {
+                            message += args[i].message + ' ';
+                        }
+                        // 检查对象转换为字符串
+                        try {
+                            message += JSON.stringify(args[i]) + ' ';
+                        } catch (e) {}
+                    }
+                }
+                message = message.toLowerCase();
+                // 过滤 ErrorBoundary 相关的警告
+                return (message.indexOf('errorboundary') >= 0 && 
+                        message.indexOf('not found logger instance') >= 0) ||
+                       (message.indexOf('errorboundary') >= 0 && 
+                        message.indexOf('chat-message-box-children') >= 0);
+            }
+            
+            // 过滤 console.error
+            var originalError = console.error;
+            console.error = function() {
+                if (!shouldFilterMessage(arguments)) {
+                    originalError.apply(console, arguments);
+                }
+            };
+            
+            // 过滤 console.warn
+            var originalWarn = console.warn;
+            console.warn = function() {
+                if (!shouldFilterMessage(arguments)) {
+                    originalWarn.apply(console, arguments);
+                }
+            };
+        })();
+        
         var webSdkScript = document.createElement('script');
         webSdkScript.src = 'https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.19/libs/cn/index.js';
         document.head.appendChild(webSdkScript);
@@ -24,12 +68,24 @@
             // 服务访问令牌（SAT）
             const serviceToken = 'sat_fz8c5xpgM0GIUWMSVnbIo5LNatLyL9InvnXjkBnJfmngNYwjOX8zmgCdEXEaLot6';
             
-            // 清除所有可能存在的会话缓存，确保每次都是新会话
+            // 为每个设备生成唯一的设备ID（存储在localStorage，不清除）
+            function getOrCreateDeviceId() {
+                const deviceIdKey = 'coze_device_id';
+                let deviceId = localStorage.getItem(deviceIdKey);
+                if (!deviceId) {
+                    // 生成设备ID：时间戳 + 随机数（简化版本）
+                    deviceId = 'device_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem(deviceIdKey, deviceId);
+                }
+                return deviceId;
+            }
+            
+            // 清除会话相关的缓存，但保留设备ID
             try {
-                // 清除localStorage中所有Coze相关的数据
+                // 清除localStorage中所有Coze相关的数据（但保留设备ID）
                 const localStorageKeys = Object.keys(localStorage);
                 localStorageKeys.forEach(key => {
-                    if (key && (
+                    if (key && key !== 'coze_device_id' && (
                         key.toLowerCase().indexOf('coze') >= 0 || 
                         key.toLowerCase().indexOf('session') >= 0 || 
                         key.toLowerCase().indexOf('chat') >= 0 ||
@@ -83,12 +139,19 @@
             }
             
             try {
+                // 获取或创建设备ID（每个设备唯一，持久化存储）
+                const deviceId = getOrCreateDeviceId();
+                console.log('设备ID:', deviceId);
+                
                 // 生成新的会话ID（在初始化之前）
                 const newSessionId = generateSessionId();
                 console.log('新会话ID:', newSessionId);
                 
-                // 生成唯一的用户ID（每次访问都不同，确保新会话）
-                const uniqueUserId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                // 基于设备ID生成用户ID（同一设备使用相同的用户ID，不同设备使用不同的用户ID）
+                // 这样每个设备都有自己独立的历史记录，不同设备之间不会共享
+                // 注意：使用 SAT 方式时，真正的会话隔离需要使用 OAuth JWT 方式并在 payload 中添加 session_name
+                // 当前通过设备ID区分用户，实现基础的数据隔离
+                const uniqueUserId = deviceId; // 直接使用设备ID作为用户ID，确保唯一性
                 
                 // 使用默认的悬浮按钮模式，不指定container
                 const chatClient = new CozeWebSDK.WebChatClient({
@@ -122,47 +185,75 @@
                 // 全局保存 chatClient 引用，方便调试
                 window.cozeChatClient = chatClient;
                 
-                // 自动打开对话框的函数
+                // 自动打开对话框的函数（参考官方文档使用 showChatBot 方法）
                 function autoOpenDialog() {
                     try {
-                        // 方法1: 尝试调用 open 方法
+                        // 方法1: 优先使用官方推荐的 showChatBot 方法
+                        if (chatClient && typeof chatClient.showChatBot === 'function') {
+                            chatClient.showChatBot();
+                            console.log('已调用 showChatBot() 方法');
+                            return true;
+                        }
+                        
+                        // 方法2: 尝试调用 open 方法
                         if (chatClient && typeof chatClient.open === 'function') {
                             chatClient.open();
                             console.log('已调用 open() 方法');
                             return true;
                         }
                         
-                        // 方法2: 查找并点击悬浮按钮
-                        var buttons = document.querySelectorAll('button, div[role="button"], [class*="button"], [class*="btn"], [style*="position: fixed"]');
+                        // 方法3: 查找并点击悬浮按钮（优化移动端检测）
+                        var buttons = document.querySelectorAll('button, div[role="button"], [class*="button"], [class*="btn"], [style*="position: fixed"], [style*="position:fixed"]');
                         for (var i = 0; i < buttons.length; i++) {
                             var btn = buttons[i];
                             var style = window.getComputedStyle(btn);
                             var rect = btn.getBoundingClientRect();
                             
-                            // 检查是否是右下角的悬浮按钮（固定定位，在右下角区域）
+                            // 检查是否是右下角的悬浮按钮（放宽条件，适配移动端）
                             if (style.position === 'fixed' && 
-                                rect.right > window.innerWidth - 100 && 
-                                rect.bottom > window.innerHeight - 100 &&
-                                rect.width > 40 && rect.width < 100 &&
-                                rect.height > 40 && rect.height < 100) {
-                                btn.click();
+                                rect.right > window.innerWidth - 150 && 
+                                rect.bottom > window.innerHeight - 150 &&
+                                rect.width > 30 && rect.width < 150 &&
+                                rect.height > 30 && rect.height < 150 &&
+                                rect.width > 0 && rect.height > 0) {
+                                // 使用更可靠的点击方式
+                                if (btn.click) {
+                                    btn.click();
+                                } else if (btn.dispatchEvent) {
+                                    var clickEvent = new MouseEvent('click', {
+                                        bubbles: true,
+                                        cancelable: true,
+                                        view: window
+                                    });
+                                    btn.dispatchEvent(clickEvent);
+                                }
                                 console.log('已点击悬浮按钮');
                                 return true;
                             }
                         }
                         
-                        // 方法3: 查找包含 Coze logo 的元素并点击
+                        // 方法4: 查找包含 Coze logo 的元素并点击
                         var cozeElements = document.querySelectorAll('[class*="coze"], [id*="coze"]');
                         for (var j = 0; j < cozeElements.length; j++) {
                             var elem = cozeElements[j];
                             var elemStyle = window.getComputedStyle(elem);
                             var elemRect = elem.getBoundingClientRect();
                             
-                            // 如果是固定定位且在右下角，尝试点击
+                            // 如果是固定定位且在右下角，尝试点击（放宽条件）
                             if (elemStyle.position === 'fixed' && 
-                                elemRect.right > window.innerWidth - 150 && 
-                                elemRect.bottom > window.innerHeight - 150) {
-                                elem.click();
+                                elemRect.right > window.innerWidth - 200 && 
+                                elemRect.bottom > window.innerHeight - 200 &&
+                                elemRect.width > 0 && elemRect.height > 0) {
+                                if (elem.click) {
+                                    elem.click();
+                                } else if (elem.dispatchEvent) {
+                                    var clickEvent = new MouseEvent('click', {
+                                        bubbles: true,
+                                        cancelable: true,
+                                        view: window
+                                    });
+                                    elem.dispatchEvent(clickEvent);
+                                }
                                 console.log('已点击 Coze 元素');
                                 return true;
                             }
@@ -182,10 +273,12 @@
                     });
                 }
                 
-                // 多次尝试打开（防止 ready 事件未触发）
+                // 多次尝试打开（防止 ready 事件未触发，增加移动端支持）
                 setTimeout(autoOpenDialog, 1000);
                 setTimeout(autoOpenDialog, 2000);
                 setTimeout(autoOpenDialog, 3000);
+                setTimeout(autoOpenDialog, 4000);
+                setTimeout(autoOpenDialog, 5000);
                 
                 // 使用 DOM 观察器检测悬浮按钮出现后自动点击
                 var observer = new MutationObserver(function(mutations) {
@@ -203,6 +296,69 @@
                 setTimeout(function() {
                     observer.disconnect();
                 }, 10000);
+                
+                // 修改文案的函数（延迟执行，确保不影响对话框加载）
+                function customizeText() {
+                    try {
+                        // 1. 修改输入框占位符文本：将"chatinputplaceholder"改为"请输入主题或链接"
+                        var inputs = document.querySelectorAll('[class*="coze"] input[type="text"], [class*="coze"] textarea, [class*="coze"] [contenteditable="true"], [class*="coze"] [contenteditable], [id*="coze"] input[type="text"], [id*="coze"] textarea, [id*="coze"] [contenteditable="true"], [id*="coze"] [contenteditable]');
+                        inputs.forEach(function(input) {
+                            if (input.placeholder && input.placeholder.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
+                                input.placeholder = '请输入主题或链接';
+                            }
+                            if (input.getAttribute('data-placeholder') && 
+                                input.getAttribute('data-placeholder').toLowerCase().indexOf('chatinputplaceholder') >= 0) {
+                                input.setAttribute('data-placeholder', '请输入主题或链接');
+                            }
+                        });
+                        
+                        // 查找包含占位符文本的 div 元素
+                        var cozeElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
+                        cozeElements.forEach(function(el) {
+                            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.hasAttribute('contenteditable')) {
+                                return;
+                            }
+                            
+                            var text = (el.textContent || el.innerText || '').trim();
+                            // 修改占位符文本
+                            if (text.toLowerCase() === 'chatinputplaceholder' || 
+                                text.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
+                                if (el.children.length === 0 || 
+                                    (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
+                                    el.textContent = '请输入主题或链接';
+                                }
+                            }
+                            
+                            // 2. 隐藏 "web_sdk_official_banner" 文本
+                            if (text.toLowerCase() === 'web_sdk_official_banner' || 
+                                text.toLowerCase().indexOf('web_sdk_official_banner') >= 0) {
+                                el.style.display = 'none';
+                                el.style.visibility = 'hidden';
+                                el.style.opacity = '0';
+                                el.style.height = '0';
+                                el.style.width = '0';
+                                el.style.overflow = 'hidden';
+                                el.style.margin = '0';
+                                el.style.padding = '0';
+                            }
+                        });
+                    } catch (e) {
+                        // 静默处理错误
+                    }
+                }
+                
+                // 延迟执行文案修改，确保对话框先加载完成
+                setTimeout(function() {
+                    // 定期执行文案修改（确保能捕获到动态生成的元素）
+                    var textInterval = setInterval(function() {
+                        customizeText();
+                    }, 1000);
+                    
+                    // 15秒后停止定时器
+                    setTimeout(function() {
+                        clearInterval(textInterval);
+                    }, 15000);
+                }, 3000); // 延迟3秒后开始修改文案
                 
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
