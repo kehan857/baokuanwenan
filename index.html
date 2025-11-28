@@ -187,60 +187,62 @@
                 setTimeout(autoOpenDialog, 2000);
                 setTimeout(autoOpenDialog, 3000);
                 
-                // 修改输入框占位符和隐藏横幅的函数
+                // 自定义UI：修改占位符文本和隐藏横幅
                 function customizeUI() {
                     try {
-                        // 1. 修改输入框占位符文本
-                        var placeholders = document.querySelectorAll('[placeholder*="chatInputPlaceholder"], [placeholder*="ChatInputPlaceholder"], [placeholder*="chat"], [placeholder*="Chat"]');
-                        placeholders.forEach(function(input) {
-                            if (input.placeholder && input.placeholder.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
-                                input.placeholder = '请输入主题或链接';
-                                console.log('已修改输入框占位符');
-                            }
-                        });
+                        // 1. 修改输入框占位符文本：将"chatinputplaceholder"改为"请输入主题或链接"
                         
-                        // 查找所有可能的输入框元素（包括 contenteditable）
-                        var allInputs = document.querySelectorAll('input[type="text"], textarea, [contenteditable="true"], [contenteditable]');
-                        allInputs.forEach(function(input) {
-                            // 检查是否有占位符属性
+                        // 方法1: 修改 placeholder 属性
+                        var inputs = document.querySelectorAll('input[type="text"], textarea, [contenteditable="true"], [contenteditable]');
+                        inputs.forEach(function(input) {
                             if (input.placeholder && input.placeholder.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
                                 input.placeholder = '请输入主题或链接';
+                                console.log('已修改输入框占位符（placeholder属性）');
                             }
-                            // 检查是否有 data-placeholder 属性
+                            // 检查 data-placeholder 属性
                             if (input.getAttribute('data-placeholder') && 
                                 input.getAttribute('data-placeholder').toLowerCase().indexOf('chatinputplaceholder') >= 0) {
                                 input.setAttribute('data-placeholder', '请输入主题或链接');
+                                console.log('已修改输入框占位符（data-placeholder属性）');
                             }
                         });
                         
-                        // 查找包含占位符文本的 div 元素（某些 SDK 可能使用 div 作为占位符）
-                        var allElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
+                        // 方法2: 查找包含占位符文本的 div 元素（某些 SDK 可能使用 div 作为占位符）
+                        var allElements = document.querySelectorAll('*');
                         allElements.forEach(function(el) {
+                            // 跳过输入框本身
+                            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.hasAttribute('contenteditable')) {
+                                return;
+                            }
+                            
                             var text = (el.textContent || el.innerText || '').trim();
                             // 如果是占位符文本，替换它
                             if (text.toLowerCase() === 'chatinputplaceholder' || 
                                 text.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
-                                // 检查是否是占位符元素（通常是空的或只有占位符文本）
-                                if (el.children.length === 0 || (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
+                                // 检查是否是占位符元素（通常是空的或只有占位符文本，且是叶子节点）
+                                if (el.children.length === 0 || 
+                                    (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
                                     el.textContent = '请输入主题或链接';
                                     console.log('已修改占位符文本元素');
                                 }
                             }
                         });
                         
-                        // 2. 隐藏 web_sdk_official_banner 文本
+                        // 2. 隐藏 "web_sdk_official_banner" 文本
                         var bannerElements = document.querySelectorAll('*');
                         bannerElements.forEach(function(el) {
                             var text = (el.textContent || el.innerText || '').trim();
                             // 查找包含 web_sdk_official_banner 的元素
-                            if (text.toLowerCase().indexOf('web_sdk_official_banner') >= 0 || 
-                                text === 'web_sdk_official_banner') {
+                            if (text.toLowerCase() === 'web_sdk_official_banner' || 
+                                text.toLowerCase().indexOf('web_sdk_official_banner') >= 0) {
                                 el.style.display = 'none';
                                 el.style.visibility = 'hidden';
                                 el.style.opacity = '0';
                                 el.style.height = '0';
                                 el.style.width = '0';
                                 el.style.overflow = 'hidden';
+                                el.style.margin = '0';
+                                el.style.padding = '0';
                                 console.log('已隐藏 web_sdk_official_banner');
                             }
                         });
