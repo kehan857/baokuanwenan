@@ -185,81 +185,22 @@
                 // 全局保存 chatClient 引用，方便调试
                 window.cozeChatClient = chatClient;
                 
-                // 自动打开对话框的函数（参考官方文档使用 showChatBot 方法）
+                // 自动打开对话框的函数（简化版本，避免干扰）
                 function autoOpenDialog() {
                     try {
                         // 方法1: 优先使用官方推荐的 showChatBot 方法
                         if (chatClient && typeof chatClient.showChatBot === 'function') {
                             chatClient.showChatBot();
-                            console.log('已调用 showChatBot() 方法');
                             return true;
                         }
                         
                         // 方法2: 尝试调用 open 方法
                         if (chatClient && typeof chatClient.open === 'function') {
                             chatClient.open();
-                            console.log('已调用 open() 方法');
                             return true;
                         }
-                        
-                        // 方法3: 查找并点击悬浮按钮（优化移动端检测）
-                        var buttons = document.querySelectorAll('button, div[role="button"], [class*="button"], [class*="btn"], [style*="position: fixed"], [style*="position:fixed"]');
-                        for (var i = 0; i < buttons.length; i++) {
-                            var btn = buttons[i];
-                            var style = window.getComputedStyle(btn);
-                            var rect = btn.getBoundingClientRect();
-                            
-                            // 检查是否是右下角的悬浮按钮（放宽条件，适配移动端）
-                            if (style.position === 'fixed' && 
-                                rect.right > window.innerWidth - 150 && 
-                                rect.bottom > window.innerHeight - 150 &&
-                                rect.width > 30 && rect.width < 150 &&
-                                rect.height > 30 && rect.height < 150 &&
-                                rect.width > 0 && rect.height > 0) {
-                                // 使用更可靠的点击方式
-                                if (btn.click) {
-                                    btn.click();
-                                } else if (btn.dispatchEvent) {
-                                    var clickEvent = new MouseEvent('click', {
-                                        bubbles: true,
-                                        cancelable: true,
-                                        view: window
-                                    });
-                                    btn.dispatchEvent(clickEvent);
-                                }
-                                console.log('已点击悬浮按钮');
-                                return true;
-                            }
-                        }
-                        
-                        // 方法4: 查找包含 Coze logo 的元素并点击
-                        var cozeElements = document.querySelectorAll('[class*="coze"], [id*="coze"]');
-                        for (var j = 0; j < cozeElements.length; j++) {
-                            var elem = cozeElements[j];
-                            var elemStyle = window.getComputedStyle(elem);
-                            var elemRect = elem.getBoundingClientRect();
-                            
-                            // 如果是固定定位且在右下角，尝试点击（放宽条件）
-                            if (elemStyle.position === 'fixed' && 
-                                elemRect.right > window.innerWidth - 200 && 
-                                elemRect.bottom > window.innerHeight - 200 &&
-                                elemRect.width > 0 && elemRect.height > 0) {
-                                if (elem.click) {
-                                    elem.click();
-                                } else if (elem.dispatchEvent) {
-                                    var clickEvent = new MouseEvent('click', {
-                                        bubbles: true,
-                                        cancelable: true,
-                                        view: window
-                                    });
-                                    elem.dispatchEvent(clickEvent);
-                                }
-                                console.log('已点击 Coze 元素');
-                                return true;
-                            }
-                        }
                     } catch (e) {
-                        console.error('自动打开对话框时出错:', e);
+                        // 静默处理错误，不输出日志避免干扰
                     }
                     return false;
                 }
@@ -267,109 +208,27 @@
                 // 监听 ready 事件
                 if (chatClient && typeof chatClient.on === 'function') {
                     chatClient.on('ready', function() {
-                        console.log('SDK ready 事件触发');
                         // 延迟后尝试打开
                         setTimeout(autoOpenDialog, 500);
                     });
                 }
                 
-                // 多次尝试打开（防止 ready 事件未触发，增加移动端支持）
+                // 多次尝试打开（防止 ready 事件未触发）
                 setTimeout(autoOpenDialog, 1000);
                 setTimeout(autoOpenDialog, 2000);
                 setTimeout(autoOpenDialog, 3000);
-                setTimeout(autoOpenDialog, 4000);
-                setTimeout(autoOpenDialog, 5000);
                 
-                // 使用 DOM 观察器检测悬浮按钮出现后自动点击
-                var observer = new MutationObserver(function(mutations) {
-                    autoOpenDialog();
-                });
-                
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true,
-                    attributes: true,
-                    attributeFilter: ['class', 'style']
-                });
-                
-                // 10秒后停止观察
-                setTimeout(function() {
-                    observer.disconnect();
-                }, 10000);
-                
-                // 修改文案的函数（延迟执行，确保不影响对话框加载）
-                function customizeText() {
-                    try {
-                        // 1. 修改输入框占位符文本：将"chatinputplaceholder"改为"请输入主题或链接"
-                        var inputs = document.querySelectorAll('[class*="coze"] input[type="text"], [class*="coze"] textarea, [class*="coze"] [contenteditable="true"], [class*="coze"] [contenteditable], [id*="coze"] input[type="text"], [id*="coze"] textarea, [id*="coze"] [contenteditable="true"], [id*="coze"] [contenteditable]');
-                        inputs.forEach(function(input) {
-                            if (input.placeholder && input.placeholder.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
-                                input.placeholder = '请输入主题或链接';
-                            }
-                            if (input.getAttribute('data-placeholder') && 
-                                input.getAttribute('data-placeholder').toLowerCase().indexOf('chatinputplaceholder') >= 0) {
-                                input.setAttribute('data-placeholder', '请输入主题或链接');
-                            }
-                        });
-                        
-                        // 查找包含占位符文本的 div 元素
-                        var cozeElements = document.querySelectorAll('[class*="coze"] *, [id*="coze"] *');
-                        cozeElements.forEach(function(el) {
-                            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.hasAttribute('contenteditable')) {
-                                return;
-                            }
-                            
-                            var text = (el.textContent || el.innerText || '').trim();
-                            // 修改占位符文本
-                            if (text.toLowerCase() === 'chatinputplaceholder' || 
-                                text.toLowerCase().indexOf('chatinputplaceholder') >= 0) {
-                                if (el.children.length === 0 || 
-                                    (el.children.length === 1 && el.children[0].textContent.trim() === '')) {
-                                    el.textContent = '请输入主题或链接';
-                                }
-                            }
-                            
-                            // 2. 隐藏 "web_sdk_official_banner" 文本
-                            if (text.toLowerCase() === 'web_sdk_official_banner' || 
-                                text.toLowerCase().indexOf('web_sdk_official_banner') >= 0) {
-                                el.style.display = 'none';
-                                el.style.visibility = 'hidden';
-                                el.style.opacity = '0';
-                                el.style.height = '0';
-                                el.style.width = '0';
-                                el.style.overflow = 'hidden';
-                                el.style.margin = '0';
-                                el.style.padding = '0';
-                            }
-                        });
-                    } catch (e) {
-                        // 静默处理错误
-                    }
-                }
-                
-                // 延迟执行文案修改，确保对话框先加载完成
-                setTimeout(function() {
-                    // 定期执行文案修改（确保能捕获到动态生成的元素）
-                    var textInterval = setInterval(function() {
-                        customizeText();
-                    }, 1000);
-                    
-                    // 15秒后停止定时器
-                    setTimeout(function() {
-                        clearInterval(textInterval);
-                    }, 15000);
-                }, 3000); // 延迟3秒后开始修改文案
                 
             } catch (error) {
                 console.error('Coze SDK 初始化错误:', error);
-                document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">初始化失败，请检查配置</div>';
+                // 移除错误处理，避免页面被替换
             }
         };
 
-        // 错误处理
+        // 错误处理（移除页面替换逻辑）
         webSdkScript.onerror = function () {
             console.error('Failed to load Coze Web SDK');
-            document.body.innerHTML = '<div style="padding: 40px; text-align: center; color: #e74c3c;">加载失败，请刷新页面重试</div>';
+            // 移除错误处理，避免页面被替换
         };
     </script>
 </body>
